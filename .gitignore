@@ -26,3 +26,4 @@ android
 # Coverage
 coverage/
 .nyc_output/
+AGENTS.md
