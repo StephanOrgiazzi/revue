@@ -1,0 +1,12 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "exclude": ["dist", ".expo"]
+}

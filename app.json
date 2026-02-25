@@ -1,0 +1,74 @@
+{
+  "expo": {
+    "name": "revue-md",
+    "slug": "revue-md",
+    "scheme": "revuemd",
+    "version": "1.0.0",
+    "web": {
+      "favicon": "./assets/AppIcons/Assets.xcassets/AppIcon.appiconset/32.png"
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "plugins": ["expo-router"],
+    "orientation": "portrait",
+    "icon": "./assets/AppIcons/appstore.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/AppIcons/splash-editorial.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.revue.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            {
+              "mimeType": "text/markdown"
+            },
+            {
+              "mimeType": "text/plain",
+              "pathPattern": "/.*\\.md"
+            },
+            {
+              "scheme": "content",
+              "mimeType": "text/markdown"
+            },
+            {
+              "scheme": "content",
+              "mimeType": "text/plain",
+              "pathPattern": "/.*\\.md"
+            },
+            {
+              "scheme": "file",
+              "mimeType": "text/markdown"
+            },
+            {
+              "scheme": "file",
+              "mimeType": "text/plain",
+              "pathPattern": "/.*\\.md"
+            }
+          ]
+        }
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/AppIcons/playstore-adaptive-foreground.png",
+        "backgroundColor": "#ffffff"
+      },
+      "icon": "./assets/AppIcons/playstore.png"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "563ef58b-094b-463e-a89c-6bedeef4736c"
+      }
+    }
+  }
+}
