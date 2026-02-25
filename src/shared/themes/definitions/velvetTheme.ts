@@ -1,0 +1,43 @@
+import { BASE_THEME_RADII, createTheme } from "@/shared/themes/themePrimitives";
+
+export const velvetTheme = createTheme({
+  id: "velvet",
+  isDark: true,
+  palette: {
+    pageBackground: "#1E1830",
+    surface: "#2A2142",
+    border: "#FFFFFF1F",
+    textPrimary: "#F8FAFC",
+    textSecondary: "#E2D9F8",
+    textMuted: "#BBAED8",
+    heading: "#FFFFFF",
+    accent: "#B9A5FF",
+    accentSecondary: "#C4B5FD",
+    error: "#FCA5A5",
+    surfaceMuted: "#2B2143",
+    overlay: "#100A22AD",
+  },
+  colors: {
+    divider: "#FFFFFF14",
+    headingSecondary: "#F5EEFF",
+    quoteText: "#E7DFFC",
+    quoteBackground: "#FFFFFF12",
+    codeBackground: "#FFFFFF12",
+    inlineCodeBackground: "#FFFFFF12",
+    listMarker: "#A5B4FC",
+    tableHeaderBackground: "#FFFFFF14",
+    tableHeaderText: "#F5EEFF",
+    fabBackground: "#F5EEFF",
+    fabIcon: "#2E1065",
+    fabShadow: "#00000033",
+    sheetHandle: "#8F84B8",
+    tocItemActiveBackground: "#47386D",
+    themeOptionBorder: "#6D5A9A",
+    themeOptionSelectedBorder: "#C4B5FD",
+  },
+  radii: {
+    ...BASE_THEME_RADII,
+    quote: 20,
+    code: 20,
+  },
+});

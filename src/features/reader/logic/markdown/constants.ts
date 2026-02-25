@@ -1,0 +1,13 @@
+export const DEFAULT_HTML_BLOCK_TARGET_MARKDOWN_CHARS = 4000;
+export const TOKEN_TYPE_SPACE = "space";
+export const READER_H2_AFTER_BAR_CLASS_NAME = "reader-h2-accent-bar";
+export const READER_H3_AFTER_H2_CLASS_NAME = "reader-h3-after-h2";
+export const READER_BLOCKQUOTE_PARAGRAPH_CLASS_NAME = "reader-blockquote-paragraph";
+export const READER_INLINE_CODE_CLASS_NAME = "inline-accent";
+export const READER_CODE_BLOCK_CLASS_NAME = "code-block";
+export const READER_CODE_BLOCK_CONTENT_CLASS_NAME = "code-block-content";
+export const READER_MATH_INLINE_CLASS_NAME = "math-inline";
+export const READER_MATH_BLOCK_CLASS_NAME = "math-block";
+export const READER_MATH_BLOCK_CONTENT_CLASS_NAME = "math-block-content";
+export const READER_MATH_BLOCK_TOKEN_TYPE = "reader-math-block";
+export const READER_MATH_INLINE_TOKEN_TYPE = "reader-math-inline";
