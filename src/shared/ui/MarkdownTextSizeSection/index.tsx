@@ -1,5 +1,7 @@
 import { memo } from "react";
 import { Text, View } from "react-native";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 
 import {
   MARKDOWN_TEXT_SIZE_LEVELS,
@@ -21,10 +23,10 @@ export const MarkdownTextSizeSection = memo(
     onSelectMarkdownTextSizeLevel,
   }: MarkdownTextSizeSectionProps) => {
     const {
-      activeTrackProgressRatio,
+      activeTrackAnimatedStyle,
+      gesture,
       onTrackLayout,
-      panHandlers,
-      thumbLeftOffset,
+      thumbAnimatedStyle,
       thumbSize,
       trackWidth,
     } = useMarkdownTextSizeSlider({
@@ -48,49 +50,54 @@ export const MarkdownTextSizeSection = memo(
             A
           </Text>
           <View className="mx-3 grow justify-center">
-            <View
-              accessibilityRole="adjustable"
-              accessibilityLabel="Markdown text size"
-              accessibilityValue={{
-                min: MARKDOWN_TEXT_SIZE_LEVELS[0],
-                now: activeMarkdownTextSizeLevel,
-                max: MARKDOWN_TEXT_SIZE_LEVELS[MARKDOWN_TEXT_SIZE_LEVELS.length - 1],
-              }}
-              className="h-8 justify-center"
-              onLayout={onTrackLayout}
-              {...panHandlers}
-            >
+            <GestureDetector gesture={gesture}>
               <View
-                pointerEvents="none"
-                className="h-1 rounded-full"
-                style={{ backgroundColor: theme.colors.divider }}
+                accessibilityRole="adjustable"
+                accessibilityLabel="Markdown text size"
+                accessibilityValue={{
+                  min: MARKDOWN_TEXT_SIZE_LEVELS[0],
+                  now: activeMarkdownTextSizeLevel,
+                  max: MARKDOWN_TEXT_SIZE_LEVELS[MARKDOWN_TEXT_SIZE_LEVELS.length - 1],
+                }}
+                className="h-8 justify-center"
+                onLayout={onTrackLayout}
               >
                 <View
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${activeTrackProgressRatio * 100}%`,
-                    backgroundColor: theme.colors.accent,
-                  }}
-                />
-              </View>
-              {trackWidth > 0 ? (
-                <View
                   pointerEvents="none"
-                  style={{
-                    width: thumbSize,
-                    height: thumbSize,
-                    borderRadius: thumbSize / 2,
-                    borderWidth: 2,
-                    borderColor: theme.colors.pageBackground,
-                    backgroundColor: theme.colors.accent,
-                    position: "absolute",
-                    left: thumbLeftOffset,
-                    top: "50%",
-                    marginTop: -thumbSize / 2,
-                  }}
-                />
-              ) : null}
-            </View>
+                  className="h-1 rounded-full"
+                  style={{ backgroundColor: theme.colors.divider }}
+                >
+                  <Animated.View
+                    className="h-full rounded-full"
+                    style={[
+                      activeTrackAnimatedStyle,
+                      {
+                        backgroundColor: theme.colors.accent,
+                      },
+                    ]}
+                  />
+                </View>
+                {trackWidth > 0 ? (
+                  <Animated.View
+                    pointerEvents="none"
+                    style={[
+                      thumbAnimatedStyle,
+                      {
+                        width: thumbSize,
+                        height: thumbSize,
+                        borderRadius: thumbSize / 2,
+                        borderWidth: 2,
+                        borderColor: theme.colors.pageBackground,
+                        backgroundColor: theme.colors.accent,
+                        position: "absolute",
+                        top: "50%",
+                        marginTop: -thumbSize / 2,
+                      },
+                    ]}
+                  />
+                ) : null}
+              </View>
+            </GestureDetector>
           </View>
           <Text
             className="text-lg font-black leading-5"
