@@ -16,9 +16,7 @@
 
 Revue is an open source iOS and Android app that turns plain `.md` files into a focused, magazine-style reading experience with local-first storage, reader controls, table of contents navigation, and automatic progress restore.
 
-<p align="center">
-  <img src="./assets/revue.png" alt="Revue app screenshot" width="320" style="border-radius: 16px;" />
-</p>
+<img src="./assets/revue.png" alt="Revue app screenshot" width="400" />
 
 ## Contents
 
@@ -69,8 +67,8 @@ Built with a modern toolchain for fast iteration and reliability: Expo Router, R
 
 ### Stack
 
-- Expo SDK 54
-- React Native 0.81
+- Expo SDK
+- React Native
 - React 19
 - Expo Router
 - NativeWind
