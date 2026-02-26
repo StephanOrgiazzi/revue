@@ -1,16 +1,28 @@
 import { act, renderHook } from "@testing-library/react-native";
-import { PanResponder } from "react-native";
+import { Gesture } from "react-native-gesture-handler";
 
 import { useMarkdownTextSizeSlider } from "@/shared/ui/MarkdownTextSizeSection/useMarkdownTextSizeSlider";
 
 describe("useMarkdownTextSizeSlider", () => {
-  let capturedPanResponderConfig: any;
+  let capturedGestureCallbacks: any = {};
 
   beforeEach(() => {
-    capturedPanResponderConfig = undefined;
-    jest.spyOn(PanResponder, "create").mockImplementation((config: any) => {
-      capturedPanResponderConfig = config;
-      return { panHandlers: {} } as any;
+    capturedGestureCallbacks = {};
+
+    const originalPan = Gesture.Pan;
+    jest.spyOn(Gesture, "Pan").mockImplementation(() => {
+      const pan = originalPan();
+
+      const wrapCallback = (name: string, cb: any) => {
+        capturedGestureCallbacks[name] = cb;
+        return pan;
+      };
+
+      jest.spyOn(pan, "onBegin").mockImplementation((cb) => wrapCallback("onBegin", cb));
+      jest.spyOn(pan, "onUpdate").mockImplementation((cb) => wrapCallback("onUpdate", cb));
+      jest.spyOn(pan, "onEnd").mockImplementation((cb) => wrapCallback("onEnd", cb));
+
+      return pan;
     });
   });
 
@@ -18,7 +30,7 @@ describe("useMarkdownTextSizeSlider", () => {
     jest.restoreAllMocks();
   });
 
-  it("computes track progress from active level", () => {
+  it("returns layout and style helpers", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
@@ -27,12 +39,14 @@ describe("useMarkdownTextSizeSlider", () => {
       }),
     );
 
-    expect(result.current.activeTrackProgressRatio).toBe(0.5);
     expect(result.current.thumbSize).toBe(22);
-    expect(result.current.thumbLeftOffset).toBe(-11);
+    expect(result.current.onTrackLayout).toBeDefined();
+    expect(result.current.gesture).toBeDefined();
+    expect(result.current.thumbAnimatedStyle).toBeDefined();
+    expect(result.current.activeTrackAnimatedStyle).toBeDefined();
   });
 
-  it("updates track width from layout and thumb offset follows", () => {
+  it("updates track width from layout", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
@@ -48,13 +62,11 @@ describe("useMarkdownTextSizeSlider", () => {
     });
 
     expect(result.current.trackWidth).toBe(200);
-    expect(result.current.activeTrackProgressRatio).toBe(1);
-    expect(result.current.thumbLeftOffset).toBe(189);
   });
 
-  it("does not emit selection when track width is not measured", () => {
+  it("does not emit selection until gesture ends", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 2,
         onSelectMarkdownTextSizeLevel,
@@ -62,15 +74,25 @@ describe("useMarkdownTextSizeSlider", () => {
     );
 
     act(() => {
-      capturedPanResponderConfig.onPanResponderGrant({
-        nativeEvent: { locationX: 20 },
+      result.current.onTrackLayout({
+        nativeEvent: { layout: { width: 100 } },
       } as any);
     });
 
+    act(() => {
+      capturedGestureCallbacks.onBegin?.({ x: 20 } as any);
+    });
+
     expect(onSelectMarkdownTextSizeLevel).not.toHaveBeenCalled();
+
+    act(() => {
+      capturedGestureCallbacks.onEnd?.({ x: 80 } as any);
+    });
+
+    expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(4);
   });
 
-  it("snaps and clamps touch values into supported levels", () => {
+  it("clamped and snaps touch values into supported levels on release", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
@@ -86,19 +108,37 @@ describe("useMarkdownTextSizeSlider", () => {
     });
 
     act(() => {
-      capturedPanResponderConfig.onPanResponderGrant({
-        nativeEvent: { locationX: -10 },
-      } as any);
-      capturedPanResponderConfig.onPanResponderMove({
-        nativeEvent: { locationX: 62 },
-      } as any);
-      capturedPanResponderConfig.onPanResponderMove({
-        nativeEvent: { locationX: 999 },
+      capturedGestureCallbacks.onEnd?.({ x: 62 } as any);
+    });
+    expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(3);
+
+    act(() => {
+      capturedGestureCallbacks.onEnd?.({ x: 999 } as any);
+    });
+    expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(5);
+  });
+
+  it("ignores non-finite gesture coordinates and keeps the current level", () => {
+    const onSelectMarkdownTextSizeLevel = jest.fn();
+    const { result } = renderHook(() =>
+      useMarkdownTextSizeSlider({
+        activeMarkdownTextSizeLevel: 3,
+        onSelectMarkdownTextSizeLevel,
+      }),
+    );
+
+    act(() => {
+      result.current.onTrackLayout({
+        nativeEvent: { layout: { width: 140 } },
       } as any);
     });
 
-    expect(onSelectMarkdownTextSizeLevel).toHaveBeenNthCalledWith(1, 1);
-    expect(onSelectMarkdownTextSizeLevel).toHaveBeenNthCalledWith(2, 3);
-    expect(onSelectMarkdownTextSizeLevel).toHaveBeenNthCalledWith(3, 5);
+    act(() => {
+      capturedGestureCallbacks.onBegin?.({ x: Number.NaN } as any);
+      capturedGestureCallbacks.onUpdate?.({ x: Number.NaN } as any);
+      capturedGestureCallbacks.onEnd?.({ x: Number.NaN } as any);
+    });
+
+    expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(3);
   });
 });

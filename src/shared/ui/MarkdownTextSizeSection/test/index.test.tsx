@@ -4,6 +4,8 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { MarkdownTextSizeSection } from "@/shared/ui/MarkdownTextSizeSection";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 
+import { Gesture } from "react-native-gesture-handler";
+
 const mockUseMarkdownTextSizeSlider = jest.fn();
 
 jest.mock("@/shared/ui/MarkdownTextSizeSection/useMarkdownTextSizeSlider", () => ({
@@ -19,10 +21,10 @@ describe("MarkdownTextSizeSection", () => {
     const onTrackLayout = jest.fn();
     const onSelectMarkdownTextSizeLevel = jest.fn();
     mockUseMarkdownTextSizeSlider.mockReturnValue({
-      activeTrackProgressRatio: 0.5,
+      activeTrackAnimatedStyle: {},
+      gesture: Gesture.Pan(),
       onTrackLayout,
-      panHandlers: {},
-      thumbLeftOffset: 44,
+      thumbAnimatedStyle: {},
       thumbSize: 18,
       trackWidth: 120,
     });
