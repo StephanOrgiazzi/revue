@@ -17,9 +17,11 @@ import { READER_MATH_MARKED_EXTENSION } from "@/features/reader/logic/markdown/m
 import type { ReaderHeadingRenderToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MARKDOWN_RENDERER = new Renderer();
-const WEB_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
+const ALLOWED_ABSOLUTE_IMAGE_PROTOCOLS = new Set(["http:", "https:", "file:"]);
+const SYNTHETIC_WEB_ORIGIN = "https://revue.local";
+let activeMarkdownSourceUri: string | undefined;
 
-function normalizeWebImageHref(href: string | null | undefined): string | null {
+function normalizeImageHref(href: string | null | undefined): string | null {
   if (!href) {
     return null;
   }
@@ -31,11 +33,37 @@ function normalizeWebImageHref(href: string | null | undefined): string | null {
 
   try {
     const parsedUrl = new URL(trimmedHref);
-    if (!WEB_IMAGE_PROTOCOLS.has(parsedUrl.protocol)) {
+    if (!ALLOWED_ABSOLUTE_IMAGE_PROTOCOLS.has(parsedUrl.protocol)) {
       return null;
     }
 
     return parsedUrl.toString();
+  } catch {
+    if (!activeMarkdownSourceUri) {
+      return null;
+    }
+  }
+
+  const normalizedSourceUri = activeMarkdownSourceUri.trim();
+  if (!normalizedSourceUri) {
+    return null;
+  }
+
+  const sourceBaseUri = normalizedSourceUri.startsWith("/")
+    ? `${SYNTHETIC_WEB_ORIGIN}${normalizedSourceUri}`
+    : normalizedSourceUri;
+
+  try {
+    const resolvedUrl = new URL(trimmedHref, sourceBaseUri);
+    if (resolvedUrl.origin === SYNTHETIC_WEB_ORIGIN) {
+      return `${resolvedUrl.pathname}${resolvedUrl.search}${resolvedUrl.hash}`;
+    }
+
+    if (!ALLOWED_ABSOLUTE_IMAGE_PROTOCOLS.has(resolvedUrl.protocol)) {
+      return null;
+    }
+
+    return resolvedUrl.toString();
   } catch {
     return null;
   }
@@ -100,14 +128,14 @@ READER_MARKDOWN_RENDERER.codespan = function ({ text }) {
 };
 
 READER_MARKDOWN_RENDERER.image = function ({ href, title, text }) {
-  const webImageHref = normalizeWebImageHref(href);
-  if (!webImageHref) {
+  const normalizedImageHref = normalizeImageHref(href);
+  if (!normalizedImageHref) {
     return "";
   }
 
   const escapedAltText = escapeHtml(text ?? "");
   const escapedTitleText = title?.trim() ? ` title="${escapeHtml(title.trim())}"` : "";
-  return `<img src="${escapeHtml(webImageHref)}" alt="${escapedAltText}"${escapedTitleText}>`;
+  return `<img src="${escapeHtml(normalizedImageHref)}" alt="${escapedAltText}"${escapedTitleText}>`;
 };
 
 READER_MARKDOWN_RENDERER.checkbox = function ({ checked }) {
@@ -126,6 +154,11 @@ export function lexReaderMarkdown(markdown: string): Token[] {
   return READER_MARKDOWN_INSTANCE.lexer(markdown);
 }
 
-export function renderReaderTokensToHtml(tokens: Token[]): string {
-  return READER_MARKDOWN_INSTANCE.parser(tokens).trim();
+export function renderReaderTokensToHtml(tokens: Token[], markdownSourceUri?: string): string {
+  activeMarkdownSourceUri = markdownSourceUri;
+  try {
+    return READER_MARKDOWN_INSTANCE.parser(tokens).trim();
+  } finally {
+    activeMarkdownSourceUri = undefined;
+  }
 }

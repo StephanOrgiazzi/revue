@@ -1,4 +1,4 @@
-import { File } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 
 import { getLibraryIndex, saveLibraryIndex } from "@/features/library/logic/libraryIndexStorage";
 import { sortLibraryItems } from "@/features/library/logic/libraryItemViewModel";
@@ -23,9 +23,35 @@ function isNativeLocalFilePath(localPath: string): boolean {
   return localPath.startsWith("file://") || localPath.startsWith("content://");
 }
 
+function resolveManagedArticleDirectory(
+  articleId: LibraryItemId,
+  localPath: string,
+): Directory | null {
+  if (!localPath.startsWith("file://")) {
+    return null;
+  }
+
+  const articleDirectory = new Directory(Paths.document, "articles", articleId);
+  const normalizedDirectoryUri = articleDirectory.uri.endsWith("/")
+    ? articleDirectory.uri
+    : `${articleDirectory.uri}/`;
+
+  return localPath.startsWith(normalizedDirectoryUri) ? articleDirectory : null;
+}
+
 function deleteLocalArticleFile(articleId: LibraryItemId, localPath: string): void {
   if (!isNativeLocalFilePath(localPath)) {
     return;
+  }
+
+  const managedArticleDirectory = resolveManagedArticleDirectory(articleId, localPath);
+  if (managedArticleDirectory) {
+    try {
+      managedArticleDirectory.delete();
+      return;
+    } catch (error) {
+      reportLocalFileDeleteFailure(articleId, managedArticleDirectory.uri, error);
+    }
   }
 
   try {

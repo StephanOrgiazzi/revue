@@ -48,18 +48,33 @@ describe("markedRenderer", () => {
     expect(html).toContain("language-ts");
   });
 
-  it("renders only web-hosted images from markdown image syntax", () => {
+  it("renders supported markdown images and rejects unsupported schemes", () => {
     const tokens = lexReaderMarkdown(
       [
         '![Cover](https://example.com/images/cover%20one.png "Cover image")',
+        "![LocalAbsolute](file:///data/user/0/revue/articles/cover.png)",
+        "![LocalRelative](./assets/cover%20two.png)",
         "![InlineSvg](data:image/svg+xml;base64,PHN2Zy8+)",
       ].join("\n\n"),
     );
-    const html = renderReaderTokensToHtml(tokens);
+    const html = renderReaderTokensToHtml(tokens, "file:///data/user/0/revue/articles/post.md");
 
     expect(html).toContain(
       '<img src="https://example.com/images/cover%20one.png" alt="Cover" title="Cover image">',
     );
+    expect(html).toContain(
+      '<img src="file:///data/user/0/revue/articles/cover.png" alt="LocalAbsolute">',
+    );
+    expect(html).toContain(
+      '<img src="file:///data/user/0/revue/articles/assets/cover%20two.png" alt="LocalRelative">',
+    );
     expect(html).not.toContain("data:image/svg+xml;base64");
+  });
+
+  it("drops unresolved relative images when source URI is unavailable", () => {
+    const tokens = lexReaderMarkdown("![LocalRelative](./assets/cover.png)");
+    const html = renderReaderTokensToHtml(tokens);
+
+    expect(html).not.toContain("<img ");
   });
 });

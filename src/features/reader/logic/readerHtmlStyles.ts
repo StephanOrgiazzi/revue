@@ -1,5 +1,6 @@
 import type { MixedStyleDeclaration, MixedStyleRecord } from "react-native-render-html";
 
+import { createReaderImageTagStyle } from "@/features/reader/logic/readerImageStyles";
 import {
   getMarkdownTextSizeScale,
   type MarkdownTextSizeLevel,
@@ -186,13 +187,7 @@ export function createReaderHtmlStyles(
         marginTop: 8,
         marginBottom: 32,
       },
-      img: {
-        borderColor: theme.colors.surfaceBorder,
-        borderWidth: 1,
-        borderRadius: theme.radii.code,
-        marginTop: 4,
-        marginBottom: theme.spacing.blockGap,
-      },
+      img: createReaderImageTagStyle(theme.spacing.blockGap),
       figure: {
         marginTop: 0,
         marginBottom: theme.spacing.blockGap,

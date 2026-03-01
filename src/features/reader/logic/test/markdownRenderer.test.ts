@@ -51,7 +51,11 @@ describe("markdownRenderer", () => {
     (lexReaderMarkdown as jest.Mock).mockReturnValue(tokens);
     (buildHtmlBlocksAndHeadings as jest.Mock).mockReturnValue(expectedResult);
 
-    const result = renderMarkdownToHtmlBlocksWithHeadings("# Hello", "Hello");
+    const result = renderMarkdownToHtmlBlocksWithHeadings(
+      "# Hello",
+      "Hello",
+      "file:///docs/post.md",
+    );
 
     expect(result).toBe(expectedResult);
     expect(lexReaderMarkdown).toHaveBeenCalledWith("# Hello");
@@ -60,8 +64,11 @@ describe("markdownRenderer", () => {
     expect(buildHtmlBlocksAndHeadings).toHaveBeenCalledWith(
       tokens,
       DEFAULT_HTML_BLOCK_TARGET_MARKDOWN_CHARS,
-      renderReaderTokensToHtml,
+      expect.any(Function),
     );
+    const chunkRenderer = (buildHtmlBlocksAndHeadings as jest.Mock).mock.calls[0][2];
+    chunkRenderer(tokens);
+    expect(renderReaderTokensToHtml).toHaveBeenCalledWith(tokens, "file:///docs/post.md");
   });
 
   it("forwards custom block target size", () => {
@@ -72,8 +79,8 @@ describe("markdownRenderer", () => {
       headings: [],
     });
 
-    renderMarkdownToHtmlBlocksWithHeadings("Body", "Title", 999);
+    renderMarkdownToHtmlBlocksWithHeadings("Body", "Title", undefined, 999);
 
-    expect(buildHtmlBlocksAndHeadings).toHaveBeenCalledWith(tokens, 999, renderReaderTokensToHtml);
+    expect(buildHtmlBlocksAndHeadings).toHaveBeenCalledWith(tokens, 999, expect.any(Function));
   });
 });

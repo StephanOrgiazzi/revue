@@ -52,6 +52,7 @@ export function ReaderScreen() {
   } = useReaderScreenViewModel({
     articleTitle: article?.title,
     articleCreatedAt: article?.createdAt,
+    articleSourceUri: article?.localPath,
     content,
     theme,
     markdownTextSizeLevel,

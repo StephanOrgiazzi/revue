@@ -1,6 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 
 import { useReaderScreenViewModel } from "@/features/reader/hooks/useReaderScreenViewModel";
+import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 import { getTheme } from "@/shared/themes/themes";
 
 jest.mock("@/features/reader/components/ReaderHtmlRenderers", () => ({
@@ -46,6 +47,7 @@ describe("useReaderScreenViewModel", () => {
       useReaderScreenViewModel({
         articleTitle: "My Article",
         articleCreatedAt: "2026-02-20T00:00:00.000Z",
+        articleSourceUri: "file:///docs/my-article.md",
         content: "# Hello",
         theme,
         markdownTextSizeLevel: 3,
@@ -65,6 +67,11 @@ describe("useReaderScreenViewModel", () => {
     expect(result.current.pageBackgroundColor).toBe(theme.colors.pageBackground);
     expect(result.current.htmlRenderers).toEqual({ custom: "renderers" });
     expect(result.current.htmlSystemFonts).toEqual(["System", "monospace"]);
+    expect(renderMarkdownToHtmlBlocksWithHeadings).toHaveBeenCalledWith(
+      "# Hello",
+      "My Article",
+      "file:///docs/my-article.md",
+    );
   });
 
   it("falls back when title/content are missing and clamps content width", () => {
@@ -73,6 +80,7 @@ describe("useReaderScreenViewModel", () => {
       useReaderScreenViewModel({
         articleTitle: undefined,
         articleCreatedAt: undefined,
+        articleSourceUri: undefined,
         content: "   ",
         theme,
         markdownTextSizeLevel: 1,

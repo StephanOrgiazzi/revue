@@ -30,6 +30,7 @@ function parseMarkdownIntoTokens(markdown: string, articleTitle?: string): Token
 export function renderMarkdownToHtmlBlocksWithHeadings(
   markdown: string,
   articleTitle?: string,
+  markdownSourceUri?: string,
   targetMarkdownCharsPerBlock: number = DEFAULT_HTML_BLOCK_TARGET_MARKDOWN_CHARS,
 ): ReaderHtmlBlocksResult {
   const tokens = parseMarkdownIntoTokens(markdown, articleTitle);
@@ -40,5 +41,7 @@ export function renderMarkdownToHtmlBlocksWithHeadings(
     };
   }
 
-  return buildHtmlBlocksAndHeadings(tokens, targetMarkdownCharsPerBlock, renderReaderTokensToHtml);
+  return buildHtmlBlocksAndHeadings(tokens, targetMarkdownCharsPerBlock, (chunkTokens) =>
+    renderReaderTokensToHtml(chunkTokens, markdownSourceUri),
+  );
 }

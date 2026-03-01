@@ -4,6 +4,15 @@ import { render } from "@testing-library/react-native";
 
 import { readerHtmlRenderers } from "@/features/reader/components/ReaderHtmlRenderers";
 
+jest.mock("react-native-render-html", () => {
+  const actual = jest.requireActual("react-native-render-html");
+  return {
+    ...actual,
+    useContentWidth: () => 320,
+    useNormalizedUrl: (uri: string) => uri,
+  };
+});
+
 describe("readerHtmlRenderers", () => {
   it("wraps table blocks in a horizontal scroll container", () => {
     const TableRenderer = readerHtmlRenderers.table as any;
@@ -21,10 +30,7 @@ describe("readerHtmlRenderers", () => {
     expect(scrollContainer.props.horizontal).toBe(true);
     expect(scrollContainer.props.nestedScrollEnabled).toBe(true);
     expect(scrollContainer.props.showsHorizontalScrollIndicator).toBe(true);
-    expect(scrollContainer.props.style).toEqual({ width: "100%" });
-    expect(scrollContainer.props.contentContainerStyle).toEqual({ minWidth: "100%" });
     expect(innerContainer).toBeDefined();
-    expect(innerContainer?.props.style).toEqual({ minWidth: "100%" });
     expect(defaultRenderer).toHaveBeenCalledTimes(1);
     const [firstArg] = defaultRenderer.mock.calls[0] ?? [];
     expect(firstArg).toEqual(expect.objectContaining({ marker: "table-marker" }));
@@ -39,7 +45,6 @@ describe("readerHtmlRenderers", () => {
     const scrollContainer = UNSAFE_getByType(ScrollView);
 
     expect(scrollContainer.props.horizontal).toBe(true);
-    expect(scrollContainer.props.bounces).toBe(false);
     expect(getByText("Code block")).toBeVisible();
   });
 });

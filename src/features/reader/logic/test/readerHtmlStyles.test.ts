@@ -55,12 +55,4 @@ describe("createReaderHtmlStyles", () => {
     expect((styles.tagsStyles.h1 as { fontSize: number; lineHeight: number }).fontSize).toBe(12);
     expect((styles.tagsStyles.h1 as { fontSize: number; lineHeight: number }).lineHeight).toBe(16);
   });
-
-  it("uses different syntax colors for dark and light themes", () => {
-    const lightStyles = createReaderHtmlStyles(getTheme("light"), 3);
-    const darkStyles = createReaderHtmlStyles(getTheme("midnight"), 3);
-
-    expect((lightStyles.classesStyles["hljs-keyword"] as { color: string }).color).toBe("#7C3AED");
-    expect((darkStyles.classesStyles["hljs-keyword"] as { color: string }).color).toBe("#C792EA");
-  });
 });

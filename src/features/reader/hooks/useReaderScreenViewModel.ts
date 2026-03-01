@@ -19,6 +19,7 @@ import { useThemePreferences } from "@/shared/themes/useThemePreferences";
 type UseReaderScreenViewModelInput = {
   articleTitle: string | undefined;
   articleCreatedAt: string | undefined;
+  articleSourceUri: string | undefined;
   content: string;
   theme: ReturnType<typeof useThemePreferences>["theme"];
   markdownTextSizeLevel: MarkdownTextSizeLevel;
@@ -29,6 +30,7 @@ type UseReaderScreenViewModelInput = {
 export function useReaderScreenViewModel({
   articleTitle,
   articleCreatedAt,
+  articleSourceUri,
   content,
   theme,
   markdownTextSizeLevel,
@@ -46,8 +48,8 @@ export function useReaderScreenViewModel({
     [theme.colors.listMarker],
   );
   const { htmlBlocks, headings } = useMemo(
-    () => renderMarkdownToHtmlBlocksWithHeadings(content, articleTitle),
-    [articleTitle, content],
+    () => renderMarkdownToHtmlBlocksWithHeadings(content, articleTitle, articleSourceUri),
+    [articleSourceUri, articleTitle, content],
   );
   const shouldShowArticleHeader = useMemo(
     () => shouldShowHeaderFromHtmlBlocks(htmlBlocks),
