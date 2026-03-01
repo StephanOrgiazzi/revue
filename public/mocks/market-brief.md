@@ -19,6 +19,8 @@ Meanwhile, competitors move. They ship faster, automate earlier, and defend marg
 
 This is not a mystery of economics. It is a failure of will.
 
+![Trading desk monitors](https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1600&q=80 "Market data flow")
+
 The companies that still win in uncertain markets do three simple things: they cut low-return projects, keep pricing power, and make decisions before consensus feels comfortable.
 
 Leadership in 2026 does not require perfect forecasts. It requires choosing a direction and accepting the cost of execution.

@@ -47,4 +47,19 @@ describe("markedRenderer", () => {
 
     expect(html).toContain("language-ts");
   });
+
+  it("renders only web-hosted images from markdown image syntax", () => {
+    const tokens = lexReaderMarkdown(
+      [
+        '![Cover](https://example.com/images/cover%20one.png "Cover image")',
+        "![InlineSvg](data:image/svg+xml;base64,PHN2Zy8+)",
+      ].join("\n\n"),
+    );
+    const html = renderReaderTokensToHtml(tokens);
+
+    expect(html).toContain(
+      '<img src="https://example.com/images/cover%20one.png" alt="Cover" title="Cover image">',
+    );
+    expect(html).not.toContain("data:image/svg+xml;base64");
+  });
 });

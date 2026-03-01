@@ -10,7 +10,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-
+settings.json
 
 
 
@@ -26,4 +26,10 @@ android
 # Coverage
 coverage/
 .nyc_output/
+
 AGENTS.md
+
+# Codex local artifacts
+.codex/
+.codex-cache/
+.codex-session*

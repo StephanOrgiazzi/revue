@@ -23,6 +23,7 @@ describe("readerScreenUtils", () => {
       const props = buildListMarkerRenderersProps("#fff");
       expect(props.ul.markerTextStyle.color).toBe("#fff");
       expect(props.ol.markerTextStyle.color).toBe("#fff");
+      expect(props.img.enableExperimentalPercentWidth).toBe(true);
     });
   });
 

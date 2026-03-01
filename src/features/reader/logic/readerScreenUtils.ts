@@ -21,6 +21,7 @@ export function buildListMarkerRenderersProps(markerColor: string) {
   return {
     ul: { markerTextStyle: markerStyle },
     ol: { markerTextStyle: markerStyle },
+    img: { enableExperimentalPercentWidth: true },
   };
 }
 

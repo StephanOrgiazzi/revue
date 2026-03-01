@@ -17,6 +17,29 @@ import { READER_MATH_MARKED_EXTENSION } from "@/features/reader/logic/markdown/m
 import type { ReaderHeadingRenderToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MARKDOWN_RENDERER = new Renderer();
+const WEB_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
+
+function normalizeWebImageHref(href: string | null | undefined): string | null {
+  if (!href) {
+    return null;
+  }
+
+  const trimmedHref = href.trim();
+  if (!trimmedHref) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(trimmedHref);
+    if (!WEB_IMAGE_PROTOCOLS.has(parsedUrl.protocol)) {
+      return null;
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return null;
+  }
+}
 
 function highlightCodeHtml(text: string, language: string): string {
   if (!text.trim()) {
@@ -74,6 +97,17 @@ READER_MARKDOWN_RENDERER.code = function ({ text, lang }) {
 
 READER_MARKDOWN_RENDERER.codespan = function ({ text }) {
   return `<code class="${READER_INLINE_CODE_CLASS_NAME}">${escapeHtml(text)}</code>`;
+};
+
+READER_MARKDOWN_RENDERER.image = function ({ href, title, text }) {
+  const webImageHref = normalizeWebImageHref(href);
+  if (!webImageHref) {
+    return "";
+  }
+
+  const escapedAltText = escapeHtml(text ?? "");
+  const escapedTitleText = title?.trim() ? ` title="${escapeHtml(title.trim())}"` : "";
+  return `<img src="${escapeHtml(webImageHref)}" alt="${escapedAltText}"${escapedTitleText}>`;
 };
 
 READER_MARKDOWN_RENDERER.checkbox = function ({ checked }) {
