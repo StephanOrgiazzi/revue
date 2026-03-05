@@ -136,7 +136,7 @@ export function useReaderPosition({
     currentScrollOffsetYRef.current = offsetY;
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (tocHeadings.length === 0) {
       setResolvedActiveHeadingSlug(null);
       return;
@@ -249,7 +249,7 @@ export function useReaderPosition({
     tocHeadings,
   ]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     restoreStoredReadingPositionIfReady();
   }, [restoreStoredReadingPositionIfReady]);
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 const FLOATING_MENU_HIDE_SCROLL_DISTANCE_PX = 380;
 
@@ -29,7 +29,7 @@ export function useReaderFloatingMenuVisibility({
     setIsFloatingMenuButtonVisibleState(isVisible);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     previousScrollOffsetYRef.current = 0;
     hideThresholdAnchorOffsetYRef.current = 0;
     hasInitializedAnchorRef.current = false;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import {
@@ -50,7 +50,7 @@ export function useReaderPanelsPager({
     [activeReaderPanel, readerPanelsTranslateX, readerPanelsViewportWidth, readerPanelsWidth],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!visible) {
       return;
     }
@@ -61,7 +61,7 @@ export function useReaderPanelsPager({
     }
   }, [readerPanelsTranslateX, readerPanelsViewportWidth, visible]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (canSwipeBetweenReaderPanels) {
       return;
     }

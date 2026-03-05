@@ -58,6 +58,9 @@ export function useLibrary(): UseLibraryResult {
   const inFlightImportUrisRef = useRef<Set<string>>(new Set());
   const hasAttemptedWebMockImportRef = useRef(false);
   const activeImportCountRef = useRef(0);
+  const initialImportedLocalPathsRef = useRef<Set<string>>(
+    new Set(initialItems.map((item) => item.localPath)),
+  );
 
   const importWorkflowState = useMemo(
     () => ({
@@ -176,18 +179,19 @@ export function useLibrary(): UseLibraryResult {
 
     hasAttemptedWebMockImportRef.current = true;
     void (async () => {
-      const importedLocalPaths = new Set(items.map((item) => item.localPath));
+      const importedLocalPaths = new Set(initialImportedLocalPathsRef.current);
       for (const mockMarkdownUri of resolveWebMockMarkdownUris()) {
         if (importedLocalPaths.has(mockMarkdownUri)) {
           continue;
         }
 
+        importedLocalPaths.add(mockMarkdownUri);
         await importFromFileUri(mockMarkdownUri, {
           autoOpenImportedArticle: false,
         });
       }
     })();
-  }, [importFromFileUri, items.length]);
+  }, [importFromFileUri]);
 
   const removeArticle = useCallback(
     async (article: LibraryItem) => {
