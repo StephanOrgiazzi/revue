@@ -4,6 +4,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
+    "types": ["jest", "node", "react", "react-native"],
     "paths": {
       "@/*": ["./src/*"]
     }

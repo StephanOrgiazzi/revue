@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "start": "expo start",
-    "build:preview:apk:arm64": "bunx eas build --platform android --profile preview",
+    "build:preview:apk:arm64": "bunx eas-cli build --platform android --profile preview",
     "prebuild": "expo prebuild",
     "postinstall": "lefthook install",
     "lint": "oxlint . && oxfmt . --check",

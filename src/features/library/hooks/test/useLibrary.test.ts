@@ -8,7 +8,6 @@ import {
   deleteLibraryItemWithOptimisticUpdate,
 } from "@/features/library/logic/libraryService";
 import { resolveIncomingImportUri } from "@/features/library/logic/web/importUri";
-import { resolveWebMockMarkdownUris } from "@/features/library/logic/web/mockMarkdown";
 
 jest.mock("expo-linking", () => ({
   addEventListener: jest.fn(),
@@ -25,10 +24,6 @@ jest.mock("@/features/library/logic/libraryService", () => ({
 
 jest.mock("@/features/library/logic/web/importUri", () => ({
   resolveIncomingImportUri: jest.fn(),
-}));
-
-jest.mock("@/features/library/logic/web/mockMarkdown", () => ({
-  resolveWebMockMarkdownUris: jest.fn(() => []),
 }));
 
 type Deferred<T> = {
@@ -75,7 +70,6 @@ describe("useLibrary", () => {
     );
     (Linking.getInitialURL as jest.Mock).mockResolvedValue(null);
     (resolveIncomingImportUri as jest.Mock).mockReturnValue(null);
-    (resolveWebMockMarkdownUris as jest.Mock).mockReturnValue([]);
     (readInitialLibrarySnapshot as jest.Mock).mockReturnValue({
       items: [],
       errorMessage: null,

@@ -4,7 +4,6 @@ import { Platform } from "react-native";
 
 import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
 import { resolveIncomingImportUri } from "@/features/library/logic/web/importUri";
-import { resolveWebMockMarkdownUris } from "@/features/library/logic/web/mockMarkdown";
 import {
   appendLibraryItem,
   appendPendingArticleId,
@@ -17,6 +16,8 @@ import {
   replaceLibraryItem,
   restoreLibraryItem,
 } from "@/features/library/logic/libraryService";
+
+const WEB_MOCK_MARKDOWN_URIS = ["/mocks/market-brief.md"];
 
 type UseLibraryResult = {
   items: LibraryItem[];
@@ -180,7 +181,7 @@ export function useLibrary(): UseLibraryResult {
     hasAttemptedWebMockImportRef.current = true;
     void (async () => {
       const importedLocalPaths = new Set(initialImportedLocalPathsRef.current);
-      for (const mockMarkdownUri of resolveWebMockMarkdownUris()) {
+      for (const mockMarkdownUri of WEB_MOCK_MARKDOWN_URIS) {
         if (importedLocalPaths.has(mockMarkdownUri)) {
           continue;
         }
