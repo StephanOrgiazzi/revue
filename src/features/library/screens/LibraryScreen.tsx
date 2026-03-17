@@ -19,15 +19,21 @@ import { ScreenContainer } from "@/shared/ui/ScreenContainer";
 
 export const LibraryScreen = () => {
   const router = useRouter();
+
   const insets = useSafeAreaInsets();
+
   const { theme, themeId, setThemeId } = useThemePreferences();
+
   const [selectedArticle, setSelectedArticle] = useState<LibraryItem | null>(null);
+
   const {
     isOpen: isControlsSheetVisible,
     open: handleOpenControls,
     close: handleCloseControls,
   } = useDisclosure();
+
   const [floatingMenuInstanceKey, setFloatingMenuInstanceKey] = useState(0);
+
   const {
     items,
     isImporting,
@@ -63,6 +69,7 @@ export const LibraryScreen = () => {
   const closeArticleActionDialog = useCallback(() => {
     setSelectedArticle(null);
   }, []);
+
   const handleImport = useCallback(() => {
     void importArticle();
   }, [importArticle]);

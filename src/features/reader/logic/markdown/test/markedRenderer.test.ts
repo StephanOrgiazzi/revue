@@ -28,6 +28,7 @@ describe("markedRenderer", () => {
         "- [ ] pending",
       ].join("\n"),
     );
+
     const html = renderReaderTokensToHtml(tokens);
 
     expect(html).toContain("<h2>Heading</h2>");
@@ -43,6 +44,7 @@ describe("markedRenderer", () => {
 
   it("sanitizes language names for code block CSS classes", () => {
     const tokens = lexReaderMarkdown("```TS++\nconst x = 1\n```");
+
     const html = renderReaderTokensToHtml(tokens);
 
     expect(html).toContain("language-ts");
@@ -57,6 +59,7 @@ describe("markedRenderer", () => {
         "![InlineSvg](data:image/svg+xml;base64,PHN2Zy8+)",
       ].join("\n\n"),
     );
+
     const html = renderReaderTokensToHtml(tokens, "file:///data/user/0/revue/articles/post.md");
 
     expect(html).toContain(
@@ -73,6 +76,7 @@ describe("markedRenderer", () => {
 
   it("drops unresolved relative images when source URI is unavailable", () => {
     const tokens = lexReaderMarkdown("![LocalRelative](./assets/cover.png)");
+
     const html = renderReaderTokensToHtml(tokens);
 
     expect(html).not.toContain("<img ");

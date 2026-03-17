@@ -11,11 +11,13 @@ type ControlsSheetControllerResult = ReturnType<typeof useControlsSheetControlle
 describe("useControlsSheetController", () => {
   it("presents when becoming visible and dismisses when hidden", () => {
     const onClose = jest.fn();
+
     const modal = {
       present: jest.fn(),
       dismiss: jest.fn(),
       snapToIndex: jest.fn(),
     };
+
     const { result, rerender } = renderHook<
       ControlsSheetControllerResult,
       ControlsSheetControllerProps
@@ -39,7 +41,9 @@ describe("useControlsSheetController", () => {
 
   it("closes immediately when startClose is called while not presented", () => {
     const onClose = jest.fn();
+
     const pendingAction = jest.fn();
+
     const { result } = renderHook(() =>
       useControlsSheetController({
         visible: false,
@@ -57,12 +61,15 @@ describe("useControlsSheetController", () => {
 
   it("queues pending close action until dismiss callback is handled", () => {
     const onClose = jest.fn();
+
     const pendingAction = jest.fn();
+
     const modal = {
       present: jest.fn(),
       dismiss: jest.fn(),
       snapToIndex: jest.fn(),
     };
+
     const { result, rerender } = renderHook<
       ControlsSheetControllerResult,
       ControlsSheetControllerProps

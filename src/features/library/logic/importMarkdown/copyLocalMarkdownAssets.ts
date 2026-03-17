@@ -129,9 +129,13 @@ function resolveAndroidSafBasePathSegments(
 
 function extractAndroidSafEntryName(uri: string): string {
   const normalizedUri = stripQueryAndFragment(uri).replace(/\/+$/g, "");
+
   const pathSegments = normalizedUri.split("/");
+
   const lastPathSegment = pathSegments[pathSegments.length - 1];
+
   const decodedLastSegment = decodeUriSegment(lastPathSegment).trim();
+
   const decodedDisplayName = decodedLastSegment.split("/").pop()?.trim() ?? "";
 
   return decodedDisplayName;
@@ -165,6 +169,7 @@ async function findAndroidSafEntryUriByPath(
 
   for (let index = 0; index < relativePathSegments.length; index += 1) {
     const segment = relativePathSegments[index];
+
     const directoryEntries = await readAndroidSafDirectoryEntries(currentDirectoryUri, context);
     if (!directoryEntries) {
       return null;
@@ -230,10 +235,12 @@ async function copyRelativeContentAsset(
   }
 
   const { path: relativePath } = splitRelativeHref(relativeHref);
+
   const basePathSegments = resolveAndroidSafBasePathSegments(
     context.sourceDirectoryPathSegments,
     grantedDirectoryUri,
   );
+
   const relativePathSegments = resolveRelativePathSegments(basePathSegments, relativePath);
   if (!relativePathSegments) {
     return false;
@@ -276,12 +283,14 @@ function rewriteMarkdownImageHref(
   }
 
   const normalizedTitle = markdownImageMatch.title?.trim();
+
   const serializedTitle = normalizedTitle ? ` "${normalizedTitle.replace(/"/g, '\\"')}"` : "";
   return `![${markdownImageMatch.altText}](${nextHref}${serializedTitle})`;
 }
 
 function collectMarkdownImageMatches(markdown: string): MarkdownImageMatch[] {
   const parsedTokens = lexer(markdown);
+
   const imageTokens: Array<{
     raw: string;
     href: string;
@@ -316,6 +325,7 @@ function collectMarkdownImageMatches(markdown: string): MarkdownImageMatch[] {
 
     searchStart = tokenStart + imageToken.raw.length;
     const rawHref = extractRawHrefFromImageToken(imageToken.raw);
+
     const rawRelativeHref = rawHref ?? imageToken.href;
 
     const normalizedHref = unwrapMarkdownLinkHref(rawRelativeHref);
@@ -356,7 +366,9 @@ export async function copyLocalMarkdownAssets(
   }
 
   const assetsDirectory = new Directory(articleDirectory, "assets");
+
   const shouldResolveWithFileBase = normalizedSourceMarkdownUri.startsWith("file://");
+
   const androidSafAssetContext = shouldResolveWithFileBase
     ? null
     : createAndroidSafAssetContext(normalizedSourceMarkdownUri);
@@ -379,6 +391,7 @@ export async function copyLocalMarkdownAssets(
     const sourceAssetUri = shouldResolveWithFileBase
       ? resolveRelativeFileAssetUri(normalizedSourceMarkdownUri, markdownImageMatch.normalizedHref)
       : null;
+
     const normalizedSourceAssetUri = sourceAssetUri ? normalizeLocalUri(sourceAssetUri) : null;
 
     copiedAssetCount += 1;

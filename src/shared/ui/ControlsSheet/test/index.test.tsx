@@ -5,10 +5,15 @@ import { ControlsSheet } from "@/shared/ui/ControlsSheet";
 import { THEME_OPTIONS } from "@/shared/themes/themes";
 
 const mockStartClose = jest.fn((action?: () => void) => action?.());
+
 const mockOnClose = jest.fn();
+
 const mockOnSelectHeading = jest.fn();
+
 const mockOnSelectTheme = jest.fn();
+
 const mockOnSelectMarkdownTextSizeLevel = jest.fn();
+
 const mockOnExitReader = jest.fn();
 
 jest.mock("@/shared/ui/ControlsSheet/useControlsSheetController", () => ({

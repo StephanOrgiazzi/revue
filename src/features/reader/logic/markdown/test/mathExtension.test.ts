@@ -15,7 +15,9 @@ describe("mathExtension", () => {
 
   it("tokenizes block math from dollar and bracket formats", () => {
     const multiline = blockExtension.tokenizer?.call({} as any, "$$\nx+y\n$$\n");
+
     const singleline = blockExtension.tokenizer?.call({} as any, "$$x+y$$\n");
+
     const bracket = blockExtension.tokenizer?.call({} as any, "\\[\nx+y\n\\]\n");
 
     expect(multiline).toMatchObject({ type: READER_MATH_BLOCK_TOKEN_TYPE, expression: "x+y" });
@@ -26,6 +28,7 @@ describe("mathExtension", () => {
 
   it("tokenizes inline paren and dollar math and rejects invalid dollar expressions", () => {
     const paren = inlineExtension.tokenizer?.call({} as any, "\\(x+y\\)");
+
     const dollar = inlineExtension.tokenizer?.call({} as any, "$x+y$");
 
     expect(paren).toMatchObject({ type: READER_MATH_INLINE_TOKEN_TYPE, expression: "x+y" });
@@ -48,6 +51,7 @@ describe("mathExtension", () => {
         expression: "x+y",
       } as any,
     );
+
     const inlineHtml = inlineExtension.renderer?.call(
       {} as any,
       {
@@ -56,6 +60,7 @@ describe("mathExtension", () => {
         expression: "x+y",
       } as any,
     );
+
     const invalidHtml = inlineExtension.renderer?.call(
       {} as any,
       {

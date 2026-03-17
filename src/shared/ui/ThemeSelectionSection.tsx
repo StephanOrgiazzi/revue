@@ -16,8 +16,11 @@ export const ThemeSelectionSection = memo(
 
     const themeDimensions = useMemo(() => {
       const availableWidth = windowWidth - 48;
+
       const count = themeOptions.length;
+
       const maxPossibleSize = (availableWidth - (count - 1) * 8) / count;
+
       const swatchSize = Math.max(34, Math.min(48, maxPossibleSize));
 
       return {
@@ -43,6 +46,7 @@ export const ThemeSelectionSection = memo(
               <Pressable
                 key={option.id}
                 className="flex-1 items-center"
+                hitSlop={6}
                 onPress={() => {
                   onSelectTheme(option.id);
                 }}

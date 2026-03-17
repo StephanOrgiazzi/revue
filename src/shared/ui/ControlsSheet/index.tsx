@@ -64,21 +64,30 @@ export function ControlsSheet({
     visible,
     onClose,
   });
+
   const insets = useSafeAreaInsets();
+
   const { height: windowHeight } = useWindowDimensions();
+
   const sheetBottomPadding = Math.max(16, insets.bottom);
+
   const canExitReader = Boolean(showTableOfContents && onExitReader);
+
   const canShowThemeSelection =
     showThemeSelection &&
     themeOptions !== undefined &&
     activeThemeId !== undefined &&
     onSelectTheme !== undefined;
+
   const canShowMarkdownTextSizeSelection =
     showMarkdownTextSizeSelection &&
     activeMarkdownTextSizeLevel !== undefined &&
     onSelectMarkdownTextSizeLevel !== undefined;
+
   const canShowReaderSettingsPanel = canShowThemeSelection || canShowMarkdownTextSizeSelection;
+
   const canSwipeBetweenReaderPanels = showTableOfContents && canShowReaderSettingsPanel;
+
   const {
     activeReaderPanel,
     handleReaderPanelsLayout,
@@ -90,6 +99,7 @@ export function ControlsSheet({
     visible,
     canSwipeBetweenReaderPanels,
   });
+
   const {
     isReaderSheet,
     isShowingSettingsPanel,
@@ -120,6 +130,7 @@ export function ControlsSheet({
       windowHeight,
     ],
   );
+
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -133,24 +144,29 @@ export function ControlsSheet({
     ),
     [theme.colors.sheetBackdrop],
   );
+
   const handleSelectHeadingPress = useCallback(
     (heading: TableOfContentsHeading) => startClose(() => onSelectHeading?.(heading)),
     [onSelectHeading, startClose],
   );
+
   const handleExitReaderPress = useCallback(
     () => startClose(() => onExitReader?.()),
     [onExitReader, startClose],
   );
+
   const handleSelectThemePress = useCallback(
     (themeId: ThemeId) => startClose(() => onSelectTheme?.(themeId)),
     [onSelectTheme, startClose],
   );
+
   const handleSelectMarkdownTextSizeLevelPress = useCallback(
     (markdownTextSizeLevel: MarkdownTextSizeLevel) => {
       onSelectMarkdownTextSizeLevel?.(markdownTextSizeLevel);
     },
     [onSelectMarkdownTextSizeLevel],
   );
+
   const renderHandle = useCallback(
     (_props: BottomSheetHandleProps) => (
       <ControlsSheetHandle
@@ -162,6 +178,7 @@ export function ControlsSheet({
     ),
     [canExitReader, handleExitReaderPress, sheetTitle, theme],
   );
+
   const settingsPanelContent = (
     <ControlsSheetSettingsContent
       theme={theme}

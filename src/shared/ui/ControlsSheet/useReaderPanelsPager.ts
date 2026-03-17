@@ -10,9 +10,13 @@ import {
 } from "react-native-reanimated";
 
 const PANEL_SWIPE_ACTIVATION_OFFSET_X = 12;
+
 const PANEL_SWIPE_FAIL_OFFSET_Y = 12;
+
 const PANEL_SWIPE_SETTLE_THRESHOLD_RATIO = 0.45;
+
 const PANEL_SWIPE_VELOCITY_INFLUENCE = 0.12;
+
 const PANEL_SWIPE_ANIMATION_DURATION_MS = 220;
 type ReaderPanel = "toc" | "settings";
 
@@ -26,12 +30,17 @@ export function useReaderPanelsPager({
   canSwipeBetweenReaderPanels,
 }: UseReaderPanelsPagerParams) {
   const [activeReaderPanel, setActiveReaderPanel] = useState<ReaderPanel>("toc");
+
   const [readerPanelsViewportWidth, setReaderPanelsViewportWidth] = useState(0);
+
   const isReaderPanelsPagerReady = readerPanelsViewportWidth > 0;
 
   const readerPanelsTranslateX = useSharedValue(0);
+
   const readerPanelsGestureStartX = useSharedValue(0);
+
   const readerPanelsWidth = useSharedValue(0);
+
   const readerPanelsAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: readerPanelsTranslateX.value }],
   }));
@@ -86,7 +95,9 @@ export function useReaderPanelsPager({
           }
 
           const minTranslateX = -panelWidth;
+
           const maxTranslateX = 0;
+
           const nextTranslateX = readerPanelsGestureStartX.value + event.translationX;
           readerPanelsTranslateX.value = Math.max(
             minTranslateX,
@@ -101,13 +112,17 @@ export function useReaderPanelsPager({
 
           const projectedTranslateX =
             readerPanelsTranslateX.value + event.velocityX * PANEL_SWIPE_VELOCITY_INFLUENCE;
+
           const clampedProjectedTranslateX = Math.max(
             -panelWidth,
             Math.min(0, projectedTranslateX),
           );
+
           const settleProgress = Math.abs(clampedProjectedTranslateX / panelWidth);
+
           const nextPanel: ReaderPanel =
             settleProgress >= PANEL_SWIPE_SETTLE_THRESHOLD_RATIO ? "settings" : "toc";
+
           const nextTranslateX = nextPanel === "toc" ? 0 : -panelWidth;
 
           readerPanelsTranslateX.value = withTiming(nextTranslateX, {

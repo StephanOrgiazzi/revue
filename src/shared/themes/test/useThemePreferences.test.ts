@@ -39,6 +39,7 @@ describe("useThemePreferences", () => {
 
   it("falls back to default snapshot when storage is empty", () => {
     const { useThemePreferences, storage } = setupModule(undefined);
+
     const { result } = renderHook(() => useThemePreferences());
 
     expect(storage.read).toHaveBeenCalledTimes(1);
@@ -51,7 +52,9 @@ describe("useThemePreferences", () => {
       themeId: "midnight",
       markdownTextSizeLevel: 5,
     });
+
     const { useThemePreferences } = setupModule(storedValue);
+
     const { result } = renderHook(() => useThemePreferences());
 
     expect(result.current.themeId).toBe("midnight");
@@ -63,7 +66,9 @@ describe("useThemePreferences", () => {
       themeId: "paper",
       markdownTextSizeLevel: 9,
     });
+
     const { useThemePreferences } = setupModule(storedValue);
+
     const { result } = renderHook(() => useThemePreferences());
 
     expect(result.current.themeId).toBe("paper");
@@ -74,6 +79,7 @@ describe("useThemePreferences", () => {
     const { useThemePreferences } = setupModule(
       '{"themeId":"not-a-theme","markdownTextSizeLevel":3}',
     );
+
     const { result } = renderHook(() => useThemePreferences());
 
     expect(result.current.themeId).toBe("light");
@@ -82,6 +88,7 @@ describe("useThemePreferences", () => {
 
   it("batches persistence and writes only latest snapshot", () => {
     const { useThemePreferences, storage } = setupModule(undefined);
+
     const { result } = renderHook(() => useThemePreferences());
 
     act(() => {
@@ -110,6 +117,7 @@ describe("useThemePreferences", () => {
 
   it("does not schedule persistence when setting same values", () => {
     const { useThemePreferences, storage } = setupModule(undefined);
+
     const { result } = renderHook(() => useThemePreferences());
 
     act(() => {

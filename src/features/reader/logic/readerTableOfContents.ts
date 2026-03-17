@@ -1,6 +1,7 @@
 import type { ReaderHeading } from "@/features/reader/logic/markdownRenderer";
 
 const ACTIVE_HEADING_SCROLL_OFFSET = 24;
+
 const ANCHOR_SCROLL_ALIGNMENT_OFFSET = 20;
 
 const TITLE_TOC_ANCHOR_SLUG = "reader-title-anchor";

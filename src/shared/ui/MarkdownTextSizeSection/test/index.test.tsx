@@ -19,6 +19,7 @@ describe("MarkdownTextSizeSection", () => {
 
   it("renders slider semantics and binds layout handler", () => {
     const onTrackLayout = jest.fn();
+
     const onSelectMarkdownTextSizeLevel = jest.fn();
     mockUseMarkdownTextSizeSlider.mockReturnValue({
       activeTrackAnimatedStyle: {},

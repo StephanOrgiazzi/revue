@@ -23,6 +23,7 @@ type LibraryGridProps = {
 };
 
 const CARD_GAP = 10;
+
 const CONTENT_PADDING_BOTTOM = 24;
 
 export const LibraryGrid = memo(
@@ -49,7 +50,9 @@ export const LibraryGrid = memo(
 
       return nextCards;
     }, [items]);
+
     const pendingArticleIdsSet = useMemo(() => new Set(pendingArticleIds), [pendingArticleIds]);
+
     const articleCardPalettes = useMemo(
       () =>
         buildCardPalettesForGrid(items, {
@@ -72,6 +75,7 @@ export const LibraryGrid = memo(
     }, []);
 
     const cardWidth = listWidth > 0 ? (listWidth - CARD_GAP) / 2 : undefined;
+
     const flatListExtraDataKey = `${theme.id}:${pendingArticleIds.join("|")}`;
 
     const handleListLayout = useCallback((event: LayoutChangeEvent) => {
@@ -116,9 +120,11 @@ export const LibraryGrid = memo(
 
     return (
       <FlatList
+        testID="library-grid-list"
         onLayout={handleListLayout}
         data={cards}
         extraData={flatListExtraDataKey}
+        showsVerticalScrollIndicator={false}
         keyExtractor={keyExtractor}
         numColumns={2}
         initialNumToRender={8}

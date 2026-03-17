@@ -8,9 +8,13 @@ type UseControlsSheetControllerParams = {
 
 export function useControlsSheetController({ visible, onClose }: UseControlsSheetControllerParams) {
   const sheetRef = useRef<BottomSheetModal>(null);
+
   const isPresentedRef = useRef(false);
+
   const isClosingRef = useRef(false);
+
   const pendingAfterCloseActionRef = useRef<(() => void) | null>(null);
+
   const flushPendingAfterCloseAction = useCallback(() => {
     const pendingAfterCloseAction = pendingAfterCloseActionRef.current;
     pendingAfterCloseActionRef.current = null;

@@ -12,13 +12,17 @@ describe("FloatingMenuButton", () => {
 
   it("runs entrance/visibility animations and handles presses", () => {
     const springMock = jest.spyOn(Animated, "spring");
+
     const timingMock = jest.spyOn(Animated, "timing");
+
     const addMock = jest.spyOn(Animated, "add");
+
     const onPress = jest.fn();
 
     const { getByRole, rerender } = render(
       <FloatingMenuButton bottomOffset={24} theme={lightTheme} onPress={onPress} visible />,
     );
+
     const button = getByRole("button");
 
     fireEvent(button, "pressIn");
@@ -33,6 +37,6 @@ describe("FloatingMenuButton", () => {
     rerender(
       <FloatingMenuButton bottomOffset={24} theme={lightTheme} onPress={onPress} visible={false} />,
     );
-    expect(timingMock).toHaveBeenCalledTimes(2);
+    expect(timingMock).toHaveBeenCalledTimes(3);
   });
 });

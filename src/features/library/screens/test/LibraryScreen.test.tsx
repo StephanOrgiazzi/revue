@@ -4,8 +4,11 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { LibraryScreen } from "@/features/library/screens/LibraryScreen";
 
 const mockPush = jest.fn();
+
 const mockSelectionTick = jest.fn();
+
 const mockLongPress = jest.fn();
+
 const mockUseLibrary = jest.fn();
 
 jest.mock("expo-router", () => ({

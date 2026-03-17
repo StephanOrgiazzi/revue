@@ -17,7 +17,9 @@ type RenderTokensToHtml = (tokens: Token[]) => string;
 function buildUniqueHeadingSlug(rawHeadingText: string, slugCounters: Map<string, number>): string {
   const slugBase =
     `heading-${normalizeComparableText(rawHeadingText).replace(/\s+/g, "-")}`.replace(/-+$/g, "");
+
   const previousCounter = slugCounters.get(slugBase) ?? 0;
+
   const nextCounter = previousCounter + 1;
   slugCounters.set(slugBase, nextCounter);
 
@@ -30,8 +32,11 @@ export function buildHtmlBlocksAndHeadings(
   renderTokensToHtml: RenderTokensToHtml,
 ): HtmlBlocksAndHeadingsResult {
   const normalizedChunkSize = Math.max(1, maxChunkSize);
+
   const htmlBlocks: string[] = [];
+
   const headings: ReaderHeading[] = [];
+
   const slugCounters = new Map<string, number>();
   let currentChunk: Token[] = [];
   let currentChunkSize = 0;
@@ -75,7 +80,9 @@ export function buildHtmlBlocksAndHeadings(
 
   for (const token of tokens) {
     const tokenSize = Math.max(1, token.raw?.length ?? 0);
+
     const startsNewSection = isHeadingBlockToken(token) && currentChunk.length > 0;
+
     const wouldOverflow =
       currentChunk.length > 0 && currentChunkSize + tokenSize > normalizedChunkSize;
 

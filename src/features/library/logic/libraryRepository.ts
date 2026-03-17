@@ -32,6 +32,7 @@ function resolveManagedArticleDirectory(
   }
 
   const articleDirectory = new Directory(Paths.document, "articles", articleId);
+
   const normalizedDirectoryUri = articleDirectory.uri.endsWith("/")
     ? articleDirectory.uri
     : `${articleDirectory.uri}/`;
@@ -118,15 +119,18 @@ export function saveLibraryItemReadingPosition(
   },
 ): void {
   const nextAnchorSlug = normalizeAnchorSlug(position.anchorSlug);
+
   const nextScrollOffsetY = normalizeScrollOffsetY(position.scrollOffsetY);
 
   const index = getLibraryIndex();
+
   const article = index[articleId];
   if (!article) {
     return;
   }
 
   const currentAnchorSlug = normalizeAnchorSlug(article.lastAnchorSlug);
+
   const currentScrollOffsetY = normalizeScrollOffsetY(article.lastScrollOffsetY);
   if (currentAnchorSlug === nextAnchorSlug && currentScrollOffsetY === nextScrollOffsetY) {
     return;

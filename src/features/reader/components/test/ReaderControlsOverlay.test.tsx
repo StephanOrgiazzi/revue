@@ -5,7 +5,9 @@ import { ReaderControlsOverlay } from "@/features/reader/components/ReaderContro
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 
 const mockOpen = jest.fn();
+
 const mockClose = jest.fn();
+
 const mockControlsSheet = jest.fn();
 let mockIsOpen = false;
 
@@ -52,9 +54,13 @@ describe("ReaderControlsOverlay", () => {
 
   it("opens controls from floating button and forwards sheet props", () => {
     const onSelectTheme = jest.fn();
+
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const onSelectHeading = jest.fn();
+
     const onExitReader = jest.fn();
+
     const { getByText } = render(
       <ReaderControlsOverlay
         isFloatingMenuVisible

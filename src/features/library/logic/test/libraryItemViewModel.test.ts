@@ -41,6 +41,7 @@ describe("libraryItemViewModel", () => {
   describe("cardPaletteForTitle", () => {
     it("returns a deterministic palette shape for a title", () => {
       const firstPalette = cardPaletteForTitle("Hello");
+
       const secondPalette = cardPaletteForTitle("Hello");
 
       expect(secondPalette).toEqual(firstPalette);
@@ -95,6 +96,7 @@ describe("libraryItemViewModel", () => {
           readingProgress: 0,
         },
       ];
+
       const palettes = buildCardPalettesForGrid(items, { columnCount: 2, leadingCellCount: 0 });
 
       expect(palettes["1"]).not.toEqual(palettes["2"]);

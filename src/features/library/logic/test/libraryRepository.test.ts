@@ -110,6 +110,7 @@ describe("libraryRepository", () => {
       id: "article-1",
       localPath: "file://mock-doc-path/articles/article-1/article.md",
     };
+
     const index = { "article-1": managedItem };
     (getLibraryIndex as jest.Mock).mockReturnValue(index);
 

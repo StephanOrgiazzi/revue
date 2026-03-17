@@ -77,8 +77,10 @@ export function ReaderArticleContent({
 
   return (
     <ScrollView
+      testID="reader-article-scroll"
       ref={articleScrollRef}
       nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={contentContainerStyle}
       onContentSizeChange={onContentSizeChange}
       onScroll={onScroll}

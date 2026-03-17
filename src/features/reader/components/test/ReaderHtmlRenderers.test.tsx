@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
 import { readerHtmlRenderers } from "@/features/reader/components/ReaderHtmlRenderers";
@@ -16,21 +16,20 @@ jest.mock("react-native-render-html", () => {
 describe("readerHtmlRenderers", () => {
   it("wraps table blocks in a horizontal scroll container", () => {
     const TableRenderer = readerHtmlRenderers.table as any;
+
     const defaultRenderer = jest.fn((props: { marker?: string }) => (
       <Text>{props.marker ?? "Rendered block"}</Text>
     ));
-    const { UNSAFE_getByType, UNSAFE_getAllByType, getByText } = render(
+
+    const { getByTestId, getByText } = render(
       <TableRenderer TDefaultRenderer={defaultRenderer} marker="table-marker" />,
     );
-    const scrollContainer = UNSAFE_getByType(ScrollView);
-    const innerContainer = UNSAFE_getAllByType(View).find(
-      (node) => node.props.style?.minWidth === "100%",
-    );
 
-    expect(scrollContainer.props.horizontal).toBe(true);
-    expect(scrollContainer.props.nestedScrollEnabled).toBe(true);
-    expect(scrollContainer.props.showsHorizontalScrollIndicator).toBe(true);
-    expect(innerContainer).toBeDefined();
+    const scrollContainer = getByTestId("reader-horizontal-scroll-block");
+
+    expect(scrollContainer).toHaveProp("horizontal", true);
+    expect(scrollContainer).toHaveProp("nestedScrollEnabled", true);
+    expect(scrollContainer).toHaveProp("showsHorizontalScrollIndicator", false);
     expect(defaultRenderer).toHaveBeenCalledTimes(1);
     const [firstArg] = defaultRenderer.mock.calls[0] ?? [];
     expect(firstArg).toEqual(expect.objectContaining({ marker: "table-marker" }));
@@ -39,12 +38,14 @@ describe("readerHtmlRenderers", () => {
 
   it("wraps pre blocks in a horizontal scroll container", () => {
     const PreRenderer = readerHtmlRenderers.pre as any;
-    const { UNSAFE_getByType, getByText } = render(
+
+    const { getByTestId, getByText } = render(
       <PreRenderer TDefaultRenderer={() => <Text>Code block</Text>} />,
     );
-    const scrollContainer = UNSAFE_getByType(ScrollView);
 
-    expect(scrollContainer.props.horizontal).toBe(true);
+    const scrollContainer = getByTestId("reader-horizontal-scroll-block");
+
+    expect(scrollContainer).toHaveProp("horizontal", true);
     expect(getByText("Code block")).toBeVisible();
   });
 });

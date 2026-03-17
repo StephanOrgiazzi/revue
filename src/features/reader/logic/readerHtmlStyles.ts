@@ -14,6 +14,7 @@ type ReaderHtmlStyles = {
 };
 
 const MIN_FONT_SIZE = 12;
+
 const MIN_LINE_HEIGHT = 16;
 
 function scaleTypographyValue(value: number, scale: number, minimum: number): number {
@@ -25,10 +26,13 @@ export function createReaderHtmlStyles(
   markdownTextSizeLevel: MarkdownTextSizeLevel,
 ): ReaderHtmlStyles {
   const typographyScale = getMarkdownTextSizeScale(markdownTextSizeLevel);
+
   const scaleFontSize = (fontSize: number) =>
     scaleTypographyValue(fontSize, typographyScale, MIN_FONT_SIZE);
+
   const scaleLineHeight = (lineHeight: number) =>
     scaleTypographyValue(lineHeight, typographyScale, MIN_LINE_HEIGHT);
+
   const syntaxColors = theme.isDark
     ? {
         keyword: "#C792EA",
@@ -63,6 +67,7 @@ export function createReaderHtmlStyles(
     marginTop: level <= 2 ? 32 : level <= 3 ? 24 : level <= 4 ? 20 : 18,
     marginBottom: level <= 2 ? (level === 1 ? 24 : 6) : level <= 3 ? 12 : 8,
   });
+
   const tableCellStyle = {
     flexGrow: 0,
     flexShrink: 0,
@@ -74,6 +79,7 @@ export function createReaderHtmlStyles(
     borderColor: theme.colors.surfaceBorder,
     borderWidth: 1,
   };
+
   const inlineCodeLikeStyle = {
     backgroundColor: theme.colors.inlineCodeBackground,
     color: theme.colors.inlineCodeText,
@@ -83,6 +89,7 @@ export function createReaderHtmlStyles(
     fontFamily: "monospace",
     fontWeight: "500" as const,
   };
+
   const blockCodeLikeStyle = {
     backgroundColor: theme.colors.codeBackground,
     borderColor: theme.colors.surfaceBorder,
@@ -93,6 +100,7 @@ export function createReaderHtmlStyles(
     paddingHorizontal: 14,
     paddingVertical: 12,
   };
+
   const createMonospaceBlockContentStyle = (fontSize: number, lineHeight: number) => ({
     color: theme.colors.codeText,
     fontFamily: "monospace",

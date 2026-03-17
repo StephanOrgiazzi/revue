@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { RenderHTMLConfigProvider, TRenderEngineProvider } from "react-native-render-html";
@@ -26,13 +26,20 @@ import { ScreenContainer } from "@/shared/ui/ScreenContainer";
 
 export function ReaderScreen() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
+
   const router = useRouter();
+
   const { width: windowWidth } = useWindowDimensions();
+
   const insets = useSafeAreaInsets();
+
   const { theme, themeId, setThemeId, markdownTextSizeLevel, setMarkdownTextSizeLevel } =
     useThemePreferences();
+
   const { article, content, errorMessage, isLoading } = useReaderArticle(params.id);
+
   const hasError = Boolean(errorMessage);
+
   const {
     htmlStyles,
     htmlSystemFonts,
@@ -59,6 +66,7 @@ export function ReaderScreen() {
     insetsTop: insets.top,
     windowWidth,
   });
+
   const {
     articleScrollRef,
     activeHeadingSlug,
@@ -76,12 +84,26 @@ export function ReaderScreen() {
     tocHeadings,
     isLoading,
   });
+
+  const [hasRenderedArticleContent, setHasRenderedArticleContent] = useState(false);
+  useEffect(() => {
+    setHasRenderedArticleContent(false);
+  }, [article?.id, isLoading]);
+  const handleContentSizeChangeWithFloatingMenu = useCallback(() => {
+    handleContentSizeChange();
+    if (!isLoading) {
+      setHasRenderedArticleContent(true);
+    }
+  }, [handleContentSizeChange, isLoading]);
+
   const {
     isFloatingMenuButtonVisible,
     handleScrollOffsetChange: handleFloatingMenuScrollOffsetChange,
   } = useReaderFloatingMenuVisibility({
-    isEnabled: !hasError && !isLoading && isReadingPositionRestoreReady,
+    isEnabled:
+      !hasError && !isLoading && isReadingPositionRestoreReady && hasRenderedArticleContent,
   });
+
   const handleArticleScrollWithFloatingMenu = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       handleFloatingMenuScrollOffsetChange(event.nativeEvent.contentOffset.y);
@@ -89,8 +111,14 @@ export function ReaderScreen() {
     },
     [handleArticleScroll, handleFloatingMenuScrollOffsetChange],
   );
+
   const shouldDisplayFloatingMenu =
-    !hasError && !isLoading && isReadingPositionRestoreReady && isFloatingMenuButtonVisible;
+    !hasError &&
+    !isLoading &&
+    isReadingPositionRestoreReady &&
+    hasRenderedArticleContent &&
+    isFloatingMenuButtonVisible;
+
   const listHeaderComponent = useMemo(
     () =>
       shouldShowArticleHeader ? (
@@ -103,10 +131,12 @@ export function ReaderScreen() {
       ) : null,
     [articleMeta, articleTitle, htmlContentWidth, shouldShowArticleHeader, theme],
   );
+
   const listEmptyComponent = useMemo(
     () => <ReaderEmptyState theme={theme} contentWidth={htmlContentWidth} />,
     [htmlContentWidth, theme],
   );
+
   const handleExitReader = useCallback(() => {
     persistReadingPosition();
     if (router.canGoBack()) {
@@ -157,7 +187,7 @@ export function ReaderScreen() {
               <ReaderArticleContent
                 articleScrollRef={articleScrollRef}
                 contentContainerStyle={contentContainerStyle}
-                onContentSizeChange={handleContentSizeChange}
+                onContentSizeChange={handleContentSizeChangeWithFloatingMenu}
                 onScroll={handleArticleScrollWithFloatingMenu}
                 shouldSuppressListHeader={shouldSuppressListHeader}
                 listHeaderComponent={listHeaderComponent}

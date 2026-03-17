@@ -45,7 +45,9 @@ export function ReaderSkeleton({
   showHeader = true,
 }: ReaderSkeletonProps) {
   const reducedMotionEnabled = useReducedMotion();
+
   const pulse = useSharedValue(reducedMotionEnabled ? 0.5 : 0);
+
   const paragraphRows = useMemo(
     () =>
       [
@@ -84,6 +86,7 @@ export function ReaderSkeleton({
 
   const pulseAnimatedStyle = useAnimatedStyle(() => {
     const minimumOpacity = theme.isDark ? 0.04 : 0.05;
+
     const maximumOpacity = theme.isDark ? 0.08 : 0.09;
 
     return {

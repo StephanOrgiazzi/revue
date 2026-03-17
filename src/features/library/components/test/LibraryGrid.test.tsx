@@ -41,9 +41,12 @@ describe("LibraryGrid", () => {
 
   it("renders grid cards and wires import/open/long-press actions", () => {
     const onImport = jest.fn();
+
     const onOpenArticle = jest.fn();
+
     const onArticleLongPress = jest.fn();
-    const { getByText, rerender } = render(
+
+    const { getByText, getByTestId, rerender } = render(
       <LibraryGrid
         theme={lightTheme}
         items={items}
@@ -59,6 +62,7 @@ describe("LibraryGrid", () => {
     expect(getByText("Alpha")).toBeTruthy();
     expect(getByText("Beta")).toBeTruthy();
     expect(getByText("Importing")).toBeTruthy();
+    expect(getByTestId("library-grid-list")).toHaveProp("showsVerticalScrollIndicator", false);
 
     fireEvent.press(getByText("Import"));
     expect(mockTriggerContextClickHaptic).toHaveBeenCalledTimes(1);

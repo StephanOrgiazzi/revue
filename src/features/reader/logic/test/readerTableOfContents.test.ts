@@ -41,6 +41,7 @@ describe("readerTableOfContents", () => {
       { slug: "h1", text: "H1", level: 2, blockIndex: 0 },
       { slug: "h2", text: "H2", level: 2, blockIndex: 1 },
     ] as any[];
+
     const blockOffsets = { 0: 100, 1: 500 };
 
     it("should return null for empty headings", () => {

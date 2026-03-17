@@ -15,6 +15,7 @@ type ParsedMarkdownDocument = {
 };
 
 const YAML_KEY_VALUE_PATTERN = /^([A-Za-z0-9_-]+)\s*:\s*(.*)$/;
+
 const YAML_LIST_ITEM_PATTERN = /^-\s+(.+)$/;
 
 function removeUtf8Bom(value: string): string {
@@ -31,6 +32,7 @@ function stripWrappingQuotes(value: string): string {
   }
 
   const firstChar = value[0];
+
   const lastChar = value[value.length - 1];
   if ((firstChar === "'" && lastChar === "'") || (firstChar === '"' && lastChar === '"')) {
     return value.slice(1, -1);
@@ -118,12 +120,14 @@ function parseMarkdownFrontMatter(
   }
 
   const lines = normalizeMarkdownLineEndings(frontMatter).split("\n");
+
   const hasYamlLikeKeyValue = lines.some((line) => parseYamlLikeKeyValue(line.trim()) !== null);
   if (!hasYamlLikeKeyValue) {
     return {};
   }
 
   const data: ParsedMarkdownFrontMatter = {};
+
   const bufferedTags: string[] = [];
   let readingTagList = false;
 

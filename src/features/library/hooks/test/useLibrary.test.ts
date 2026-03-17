@@ -45,6 +45,7 @@ function createDeferred<T>(): Deferred<T> {
 
 describe("useLibrary", () => {
   const mockRemoveListener = jest.fn();
+
   const mockItem = {
     id: "1",
     title: "Alpha",

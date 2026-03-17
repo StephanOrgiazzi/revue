@@ -60,6 +60,7 @@ describe("platformStorage", () => {
 
     it("write creates directory/file and skips duplicate writes", () => {
       const mockDir = { create: jest.fn() };
+
       const mockFile = {
         exists: false,
         create: jest.fn(),

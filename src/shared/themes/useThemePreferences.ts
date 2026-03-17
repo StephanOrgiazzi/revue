@@ -28,6 +28,7 @@ type RawThemePreferencesRecordValue = string | undefined;
 type ThemePreferencesRecordParseResult = ThemePreferencesRecord | null;
 
 const THEME_PREFERENCES_STORAGE_KEY = "theme_preferences";
+
 const storage = createPlatformStorage({
   key: THEME_PREFERENCES_STORAGE_KEY,
 });
@@ -156,6 +157,7 @@ export function useThemePreferences(): ThemePreferences {
     getThemePreferencesSnapshot,
     getThemePreferencesSnapshot,
   );
+
   const theme = useMemo(() => getTheme(snapshot.themeId), [snapshot.themeId]);
 
   return {

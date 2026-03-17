@@ -1,4 +1,5 @@
 # The Ledger
+
 Feb 21, 2026
 
 February 19, 2026
@@ -9,7 +10,7 @@ February 19, 2026
 
 ### What about courage? What about discipline? What if we actually tried?
 
-*By Daniel Hartwell*
+_By Daniel Hartwell_
 
 At the start of this cycle, after another quarter of speeches and delays, we heard the same line from policymakers and executives alike: "Yes, this reform is necessary, but we cannot do it right now."
 

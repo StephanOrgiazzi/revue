@@ -4,7 +4,9 @@ import { Animated, Easing, Pressable, Text } from "react-native";
 import type { Theme } from "@/shared/themes/themes";
 
 const FAB_ENTRANCE_OFFSET_PX = 18;
+
 const FAB_HIDDEN_TRANSLATE_Y_PX = 96;
+
 const FAB_VISIBILITY_ANIMATION_DURATION_MS = 180;
 
 type FloatingMenuButtonProps = {
@@ -23,17 +25,18 @@ export function FloatingMenuButton({
   accessibilityLabel = "Open reading controls",
 }: FloatingMenuButtonProps) {
   const entranceTranslateY = useRef(new Animated.Value(FAB_ENTRANCE_OFFSET_PX)).current;
+
   const visibilityTranslateY = useRef(
     new Animated.Value(visible ? 0 : FAB_HIDDEN_TRANSLATE_Y_PX),
   ).current;
+
   const pressScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.spring(entranceTranslateY, {
+    Animated.timing(entranceTranslateY, {
       toValue: 0,
-      damping: 18,
-      stiffness: 220,
-      mass: 0.8,
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
   }, [entranceTranslateY]);
@@ -89,7 +92,7 @@ export function FloatingMenuButton({
         disabled={!visible}
         style={{
           backgroundColor: theme.colors.fabBackground,
-          boxShadow: `0px 4px 8px ${theme.colors.fabShadow}`,
+          boxShadow: `0px 10px 20px ${theme.colors.fabShadow}, 0px 2px 6px ${theme.colors.fabShadow}`,
         }}
         onPress={onPress}
         onPressIn={handlePressIn}

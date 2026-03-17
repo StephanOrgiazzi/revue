@@ -41,37 +41,52 @@ export function useReaderScreenViewModel({
     () => createReaderHtmlStyles(theme, markdownTextSizeLevel),
     [markdownTextSizeLevel, theme],
   );
+
   const htmlSystemFonts = useMemo(() => buildHtmlSystemFonts(), []);
+
   const htmlRenderers = readerHtmlRenderers;
+
   const htmlRenderersProps = useMemo(
     () => buildListMarkerRenderersProps(theme.colors.listMarker),
     [theme.colors.listMarker],
   );
+
   const { htmlBlocks, headings } = useMemo(
     () => renderMarkdownToHtmlBlocksWithHeadings(content, articleTitle, articleSourceUri),
     [articleSourceUri, articleTitle, content],
   );
+
   const shouldShowArticleHeader = useMemo(
     () => shouldShowHeaderFromHtmlBlocks(htmlBlocks),
     [htmlBlocks],
   );
+
   const tocHeadings = useMemo(
     () => buildReaderTocHeadings(headings, articleTitle, shouldShowArticleHeader),
     [articleTitle, headings, shouldShowArticleHeader],
   );
 
   const pageBackgroundColor = theme.colors.pageBackground;
+
   const horizontalPadding = theme.spacing.pagePaddingHorizontal;
+
   const topContentPadding = insetsTop + theme.spacing.pagePaddingVertical;
+
   const htmlContentWidth = Math.max(
     MIN_HTML_CONTENT_WIDTH,
     Math.min(windowWidth - horizontalPadding * 2, MAX_HTML_CONTENT_WIDTH),
   );
+
   const screenTitle = articleTitle ?? "Reader";
+
   const normalizedArticleTitle = articleTitle ?? "Untitled";
+
   const formattedDate = useMemo(() => formatArticleDate(articleCreatedAt), [articleCreatedAt]);
+
   const articleMeta = useMemo(() => buildArticleMeta(formattedDate), [formattedDate]);
+
   const isContentEmpty = htmlBlocks.length === 0;
+
   const contentContainerStyle = useMemo(
     () => ({
       paddingTop: topContentPadding,

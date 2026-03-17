@@ -19,6 +19,7 @@ function getWidthValues(
   return animatedNodes
     .map((node) => {
       const styles = Array.isArray(node.props.style) ? node.props.style : [node.props.style];
+
       const staticStyle = styles.find(
         (style) =>
           style &&
@@ -43,7 +44,9 @@ describe("ReaderSkeleton", () => {
         showHeader
       />,
     );
+
     const animatedBars = UNSAFE_getAllByType(Animated.View) as Array<{ props: { style: unknown } }>;
+
     const widths = getWidthValues(animatedBars);
 
     expect(widths).toHaveLength(17);
@@ -61,7 +64,9 @@ describe("ReaderSkeleton", () => {
         showHeader={false}
       />,
     );
+
     const animatedBars = UNSAFE_getAllByType(Animated.View) as Array<{ props: { style: unknown } }>;
+
     const widths = getWidthValues(animatedBars);
 
     expect(widths).toHaveLength(15);

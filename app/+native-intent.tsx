@@ -1,4 +1,5 @@
 const FILE_PROVIDER_FIRST_SEGMENTS = new Set(["external", "document", "tree", "file"]);
+
 const APP_ROUTE_PREFIXES = ["/reader"];
 
 type RedirectSystemPathParams = {
@@ -32,6 +33,7 @@ function toImportRoute(uri: string): string {
 
 function contentUriFromPath(path: string): string | null {
   const normalizedPath = normalizePath(path).split(/[?#]/, 1)[0];
+
   const segments = normalizedPath.split("/").filter(Boolean);
 
   if (segments.length < 2) {
@@ -39,6 +41,7 @@ function contentUriFromPath(path: string): string | null {
   }
 
   const host = segments[0];
+
   const firstSegment = segments[1];
   if (!host || !firstSegment || !FILE_PROVIDER_FIRST_SEGMENTS.has(firstSegment)) {
     return null;
@@ -55,6 +58,7 @@ function fileUriFromPath(path: string): string | null {
   }
 
   const segments = normalizedPath.split("/").filter(Boolean);
+
   const host = segments[0];
   if (!host) {
     return null;
@@ -105,6 +109,7 @@ export function redirectSystemPath({ path }: RedirectSystemPathParams): string {
     }
 
     const parsedUrl = new URL(trimmedPath, "revuemd://");
+
     const protocol = parsedUrl.protocol.toLowerCase();
 
     if (protocol === "content:" || protocol === "file:") {

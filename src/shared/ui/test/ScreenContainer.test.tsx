@@ -21,7 +21,9 @@ describe("ScreenContainer", () => {
         <Text>Test Child</Text>
       </ScreenContainer>,
     );
+
     const safeArea = getByTestId("safe-area");
+
     const contentContainer = UNSAFE_getAllByType(View).find(
       (node) => node.props.testID !== "safe-area",
     );
@@ -43,7 +45,9 @@ describe("ScreenContainer", () => {
         <Text>Configured</Text>
       </ScreenContainer>,
     );
+
     const safeArea = getByTestId("safe-area");
+
     const contentContainer = UNSAFE_getAllByType(View).find(
       (node) => node.props.testID !== "safe-area",
     );

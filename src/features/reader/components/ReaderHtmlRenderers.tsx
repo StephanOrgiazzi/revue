@@ -17,16 +17,20 @@ const HORIZONTAL_SCROLL_CONTENT_CONTAINER_STYLE = {
 } as const;
 
 const IMAGE_MIN_HEIGHT = 120;
+
 const IMAGE_DEFAULT_ASPECT_RATIO = 16 / 9;
+
 const IMAGE_CONTAINER_STYLE = {
   width: "100%",
   ...READER_IMAGE_BORDERLESS_STYLE,
   overflow: "hidden",
 } as const;
+
 const IMAGE_STYLE_BASE = {
   width: "100%",
   borderRadius: READER_IMAGE_CORNER_RADIUS,
 } as const;
+
 const IMAGE_CAPTION_STYLE = {
   textAlign: "center",
   fontSize: 13,
@@ -43,11 +47,12 @@ const horizontalScrollableBlockRenderer: CustomBlockRenderer =
   function HorizontalScrollableBlockRenderer({ TDefaultRenderer, ...props }) {
     return (
       <ScrollView
+        testID="reader-horizontal-scroll-block"
         horizontal
         style={HORIZONTAL_SCROLL_CONTAINER_STYLE}
         nestedScrollEnabled
         bounces={false}
-        showsHorizontalScrollIndicator
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={HORIZONTAL_SCROLL_CONTENT_CONTAINER_STYLE}
       >
         <View style={HORIZONTAL_SCROLL_CONTENT_CONTAINER_STYLE}>
@@ -59,11 +64,17 @@ const horizontalScrollableBlockRenderer: CustomBlockRenderer =
 
 const imageRenderer: CustomBlockRenderer = function ImageRenderer({ tnode, style }) {
   const contentWidth = useContentWidth();
+
   const sourceUri = useNormalizedUrl(tnode.attributes.src ?? "");
+
   const altText = tnode.attributes.alt?.trim() || "Image unavailable";
+
   const captionText = tnode.attributes.title?.trim();
+
   const altColor = tnode.styles.nativeTextFlow.color ?? "#667085";
+
   const [aspectRatio, setAspectRatio] = useState<number>(IMAGE_DEFAULT_ASPECT_RATIO);
+
   const [hasLoadError, setHasLoadError] = useState(false);
 
   useEffect(() => {
@@ -106,6 +117,7 @@ const imageRenderer: CustomBlockRenderer = function ImageRenderer({ tnode, style
         accessibilityLabel={altText}
         onLoad={({ nativeEvent }: ImageLoadEvent) => {
           const width = nativeEvent.source.width;
+
           const height = nativeEvent.source.height;
           if (width > 0 && height > 0) {
             setAspectRatio(width / height);

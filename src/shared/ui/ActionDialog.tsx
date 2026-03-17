@@ -48,7 +48,7 @@ export const ActionDialog = ({ visible, title, message, actions, onClose }: Acti
             backgroundColor: theme.colors.sheetBackground,
             borderColor: theme.colors.surfaceBorder,
             borderWidth: theme.isDark ? 1 : 0,
-            boxShadow: "0px 12px 16px rgba(0, 0, 0, 0.3)",
+            boxShadow: "0px 16px 32px rgba(15, 23, 42, 0.18), 0px 4px 10px rgba(15, 23, 42, 0.12)",
           }}
           onPress={() => undefined}
         >
@@ -79,6 +79,8 @@ export const ActionDialog = ({ visible, title, message, actions, onClose }: Acti
             {actions.map((action, index) => (
               <Pressable
                 key={action.id ?? `${action.style ?? "default"}-${action.label}`}
+                accessibilityRole="button"
+                accessibilityLabel={action.label}
                 className="items-center px-6 py-4 active:opacity-60"
                 style={{
                   borderBottomWidth: index === actions.length - 1 ? 0 : HAIRLINE_WIDTH,

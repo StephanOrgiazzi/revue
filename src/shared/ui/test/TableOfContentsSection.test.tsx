@@ -9,6 +9,7 @@ import {
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 
 const mockTriggerFrequentTickHaptic = jest.fn();
+
 const mockTriggerSelectionTickHaptic = jest.fn();
 
 jest.mock("@/shared/logic/haptics", () => ({
@@ -18,6 +19,7 @@ jest.mock("@/shared/logic/haptics", () => ({
 
 jest.mock("@gorhom/bottom-sheet", () => {
   const React = require("react");
+
   const { FlatList, Pressable, Text } = require("react-native");
 
   const BottomSheetFlatList = React.forwardRef(
@@ -63,6 +65,7 @@ describe("TableOfContentsSection", () => {
 
   it("filters headings above level 3 and handles selection", () => {
     const onSelectHeading = jest.fn();
+
     const { getByText, queryByText } = render(
       <TableOfContentsSection
         visible

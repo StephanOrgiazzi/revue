@@ -52,6 +52,7 @@ export async function readArticleContent(
   throwIfAborted(options?.signal);
 
   const contentWithoutFrontMatter = extractMarkdownFrontMatter(rawMarkdown).content;
+
   const normalizedContent = normalizeMarkdownLineEndings(contentWithoutFrontMatter);
   return sanitizeEmbeddedMarkdownDataUris(normalizedContent).trim();
 }

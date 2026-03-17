@@ -49,16 +49,25 @@ export function useLibrary(): UseLibraryResult {
   const [{ items: initialItems, errorMessage: initialErrorMessage }] = useState(
     readInitialLibrarySnapshot,
   );
+
   const [items, setItems] = useState<LibraryItem[]>(initialItems);
+
   const [isImporting, setIsImporting] = useState(false);
+
   const [pendingArticleIds, setPendingArticleIds] = useState<LibraryItemId[]>([]);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(initialErrorMessage);
+
   const [pendingAutoOpenArticleId, setPendingAutoOpenArticleId] = useState<LibraryItemId | null>(
     null,
   );
+
   const inFlightImportUrisRef = useRef<Set<string>>(new Set());
+
   const hasAttemptedWebMockImportRef = useRef(false);
+
   const activeImportCountRef = useRef(0);
+
   const initialImportedLocalPathsRef = useRef<Set<string>>(
     new Set(initialItems.map((item) => item.localPath)),
   );

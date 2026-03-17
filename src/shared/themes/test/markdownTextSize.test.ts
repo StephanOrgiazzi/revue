@@ -35,6 +35,7 @@ describe("markdownTextSize", () => {
 
   it("uses larger scales for larger levels", () => {
     const scales = MARKDOWN_TEXT_SIZE_LEVELS.map((level) => getMarkdownTextSizeScale(level));
+
     const isMonotonic = scales.every((scale, index) => index === 0 || scale > scales[index - 1]);
 
     expect(isMonotonic).toBe(true);

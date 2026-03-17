@@ -7,6 +7,7 @@ import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 describe("ControlsSheetHandle", () => {
   it("shows exit card when enabled and handles press", () => {
     const onExitReaderPress = jest.fn();
+
     const { getByText } = render(
       <ControlsSheetHandle
         theme={lightTheme}

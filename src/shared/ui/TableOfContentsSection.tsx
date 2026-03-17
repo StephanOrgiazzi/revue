@@ -41,7 +41,9 @@ type TableOfContentsScrollToIndexError = {
 };
 
 const TOC_ITEM_TOTAL_HEIGHT = 58;
+
 const TOC_LIST_BOTTOM_PADDING = 12;
+
 const TOC_SCROLL_HAPTIC_COOLDOWN_MS = 45;
 
 export const TableOfContentsSection = memo(
@@ -55,18 +57,25 @@ export const TableOfContentsSection = memo(
     showBottomDivider = true,
   }: TableOfContentsSectionProps) => {
     const tocListRef = useRef<BottomSheetFlatListMethods>(null);
+
     const isUserScrollingRef = useRef(false);
+
     const lastHapticIndexRef = useRef<number | null>(null);
+
     const lastHapticAtMsRef = useRef(0);
+
     const filteredHeadings = useMemo(
       () => headings.filter((heading) => heading.level <= 3),
       [headings],
     );
+
     const activeHeadingIndex = useMemo(
       () => filteredHeadings.findIndex((heading) => heading.slug === activeHeadingSlug),
       [activeHeadingSlug, filteredHeadings],
     );
+
     const headingKeyExtractor = useCallback((heading: TableOfContentsHeading) => heading.slug, []);
+
     const scrollToActiveHeading = useCallback(() => {
       if (activeHeadingIndex < 0) {
         return;
@@ -151,6 +160,7 @@ export const TableOfContentsSection = memo(
       },
       [activeHeadingSlug, onSelectHeading, theme],
     );
+
     const handleTocScroll = useCallback(
       (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         if (!visible || !isUserScrollingRef.current || filteredHeadings.length === 0) {
@@ -158,6 +168,7 @@ export const TableOfContentsSection = memo(
         }
 
         const rawIndex = Math.round(event.nativeEvent.contentOffset.y / TOC_ITEM_TOTAL_HEIGHT);
+
         const clampedIndex = Math.max(0, Math.min(filteredHeadings.length - 1, rawIndex));
 
         if (clampedIndex === lastHapticIndexRef.current) {
@@ -175,15 +186,18 @@ export const TableOfContentsSection = memo(
       },
       [filteredHeadings.length, visible],
     );
+
     const handleTocScrollBeginDrag = useCallback(() => {
       isUserScrollingRef.current = true;
     }, []);
+
     const handleTocScrollEndDrag = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const velocityY = Math.abs(event.nativeEvent.velocity?.y ?? 0);
       if (velocityY < 0.05) {
         isUserScrollingRef.current = false;
       }
     }, []);
+
     const handleTocMomentumEnd = useCallback(() => {
       isUserScrollingRef.current = false;
     }, []);

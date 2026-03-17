@@ -4,11 +4,17 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { ReaderScreen } from "@/features/reader/screens/ReaderScreen";
 
 const mockBack = jest.fn();
+
 const mockReplace = jest.fn();
+
 const mockPersistReadingPosition = jest.fn();
+
 const mockUseReaderArticle = jest.fn();
+
 const mockUseReaderPosition = jest.fn();
+
 const mockUseReaderFloatingMenuVisibility = jest.fn();
+
 const mockReaderControlsOverlay = jest.fn();
 let mockCanGoBack = true;
 

@@ -5,12 +5,17 @@ import { getTheme } from "@/shared/themes/themes";
 describe("createReaderHtmlStyles", () => {
   it("scales typography from markdown text size level", () => {
     const theme = getTheme("light");
+
     const smallStyles = createReaderHtmlStyles(theme, 1);
+
     const largeStyles = createReaderHtmlStyles(theme, 5);
 
     const smallScale = getMarkdownTextSizeScale(1);
+
     const largeScale = getMarkdownTextSizeScale(5);
+
     const expectedSmallBaseFont = Math.max(12, Math.round(theme.typography.bodySize * smallScale));
+
     const expectedLargeBaseFont = Math.max(12, Math.round(theme.typography.bodySize * largeScale));
 
     expect(smallStyles.baseStyle.fontSize).toBe(expectedSmallBaseFont);
@@ -22,6 +27,7 @@ describe("createReaderHtmlStyles", () => {
 
   it("enforces minimum readable typography values", () => {
     const baseTheme = getTheme("paper");
+
     const tinyTheme = {
       ...baseTheme,
       typography: {
@@ -48,6 +54,7 @@ describe("createReaderHtmlStyles", () => {
         },
       },
     };
+
     const styles = createReaderHtmlStyles(tinyTheme, 1);
 
     expect(styles.baseStyle.fontSize).toBe(12);

@@ -24,6 +24,7 @@ export function useReaderArticle(
   routeId: LibraryItemId | LibraryItemId[] | undefined,
 ): UseReaderArticleResult {
   const articleId = getSingleRouteParam(routeId);
+
   const [state, setState] = useState<ReaderArticleState>({
     article: null,
     content: "",

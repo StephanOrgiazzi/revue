@@ -21,6 +21,7 @@ function getLevelIndex(markdownTextSizeLevel: MarkdownTextSizeLevel): number {
 
 function getLevelFromProgress(progress: number): MarkdownTextSizeLevel {
   const maxIndex = MARKDOWN_TEXT_SIZE_LEVELS.length - 1;
+
   const snappedIndex = Math.round(progress * maxIndex);
 
   return MARKDOWN_TEXT_SIZE_LEVELS[snappedIndex] ?? MARKDOWN_TEXT_SIZE_LEVELS[0];
@@ -49,10 +50,13 @@ export function useMarkdownTextSizeSlider({
   const [trackWidth, setTrackWidth] = useState(0);
 
   const maxLevelIndex = MARKDOWN_TEXT_SIZE_LEVELS.length - 1;
+
   const activeLevelIndex = Math.max(0, getLevelIndex(activeMarkdownTextSizeLevel));
+
   const targetProgress = maxLevelIndex === 0 ? 0 : activeLevelIndex / maxLevelIndex;
 
   const progress = useSharedValue(targetProgress);
+
   const isDragging = useSharedValue(false);
 
   useEffect(() => {
@@ -91,11 +95,13 @@ export function useMarkdownTextSizeSlider({
         isDragging.value = false;
 
         const currentProgress = getProgressFromGestureX(event.x, trackWidth, progress.value);
+
         const nextLevel = getLevelFromProgress(currentProgress);
 
         onSelectMarkdownTextSizeLevel(nextLevel);
 
         const nextIndex = getLevelIndex(nextLevel);
+
         const snappedProgress = maxLevelIndex === 0 ? 0 : nextIndex / maxLevelIndex;
         progress.value = snappedProgress;
       });

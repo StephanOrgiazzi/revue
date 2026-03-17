@@ -19,6 +19,7 @@ describe("ThemeSelectionSection", () => {
       fontScale: 1,
     });
     const onSelectTheme = jest.fn();
+
     const { getAllByText, getByText } = render(
       <ThemeSelectionSection
         theme={lightTheme}

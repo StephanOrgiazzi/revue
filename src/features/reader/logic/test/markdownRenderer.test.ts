@@ -44,6 +44,7 @@ describe("markdownRenderer", () => {
 
   it("runs token pipeline and chunking with default target size", () => {
     const tokens = [{ type: "heading", text: "Hello" }] as any[];
+
     const expectedResult = {
       htmlBlocks: ["<h1>Hello</h1>"],
       headings: [{ slug: "hello", text: "Hello", level: 1, blockIndex: 0 }],

@@ -11,8 +11,11 @@ import { parseMarkdownDocument } from "@/shared/logic/markdown";
 import { readTextFromWebUri } from "@/shared/logic/web/textUri";
 
 const mockFileTextByUri = new Map<string, string>();
+
 const mockFileCopyCalls: Array<{ from: string; to: string }> = [];
+
 const mockLegacyCopyCalls: Array<{ from: string; to: string }> = [];
+
 const mockSafDirectoryEntriesByUri = new Map<string, string[]>();
 let mockSafDirectoryPermissionResult: { granted: boolean; directoryUri?: string } = {
   granted: false,
@@ -152,6 +155,7 @@ describe("importMarkdown", () => {
       });
 
       const pickedAsset = { name: "test.md", uri: "http://test.md" };
+
       const options = { id: "1", createdAt: "2023-01-01" };
 
       const result = await finalizeMarkdownImport(pickedAsset, options as any);
@@ -170,6 +174,7 @@ describe("importMarkdown", () => {
       });
 
       const pickedAsset = { name: "test.md", uri: "http://test.md" };
+
       const result = await finalizeMarkdownImport(pickedAsset, { id: "1", createdAt: "1" } as any);
       expect(result.title).toBe("FM Title");
     });
@@ -297,8 +302,10 @@ describe("importMarkdown", () => {
         name: "converted_document.md",
         uri: "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fconverted_document.md",
       };
+
       const grantedDirectoryUri =
         "content://com.android.externalstorage.documents/tree/primary%3ADownload";
+
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fserenissima.png";
       mockSafDirectoryPermissionResult = {
@@ -345,12 +352,16 @@ describe("importMarkdown", () => {
         name: "converted_document.md",
         uri: "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fconverted_document.md",
       };
+
       const grantedDirectoryUri =
         "content://com.android.externalstorage.documents/tree/primary%3ADownload";
+
       const postsDirectoryUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts";
+
       const imagesDirectoryUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fimages";
+
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fimages%2Fchart.png";
 
@@ -395,10 +406,13 @@ describe("importMarkdown", () => {
         name: "converted_document.md",
         uri: "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fsub%2Fconverted_document.md",
       };
+
       const grantedDirectoryUri =
         "content://com.android.externalstorage.documents/tree/primary%3ADownload";
+
       const postsDirectoryUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts";
+
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fshared.png";
 
@@ -439,8 +453,10 @@ describe("importMarkdown", () => {
         name: "converted_document.md",
         uri: "content://com.android.providers.downloads.documents/document/msf%3A1234",
       };
+
       const grantedDirectoryUri =
         "content://com.android.externalstorage.documents/tree/primary%3ADownload";
+
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fserenissima.png";
 

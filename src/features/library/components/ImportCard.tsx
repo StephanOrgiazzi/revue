@@ -18,6 +18,8 @@ export const ImportCard = memo(({ theme, isImporting, onPress }: ImportCardProps
         onPress();
       }}
       disabled={isImporting}
+      accessibilityRole="button"
+      accessibilityLabel="Import markdown file"
       className="h-[180px] w-full items-center justify-center overflow-hidden rounded-[13px] border border-dashed p-4"
       style={{
         borderColor: theme.colors.accent,

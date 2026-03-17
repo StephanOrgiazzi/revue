@@ -15,11 +15,17 @@ import type { ReaderMathToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MATH_EM_STRONG_MASK_REGEX =
   /(?:\$\$[\s\S]+?\$\$)|(?:\\\[[\s\S]+?\\\])|(?:\\\([\s\S]+?\\\))|(?:\$[^\n$]+?\$)/g;
+
 const READER_MATH_BLOCK_DOLLAR_MULTILINE_REGEX = /^\$\$[ \t]*\n([\s\S]+?)\n\$\$[ \t]*(?:\n+|$)/;
+
 const READER_MATH_BLOCK_DOLLAR_SINGLE_LINE_REGEX = /^\$\$([^\n]+?)\$\$[ \t]*(?:\n+|$)/;
+
 const READER_MATH_BLOCK_BRACKET_REGEX = /^\\\[[ \t]*\n?([\s\S]+?)\n?\\\][ \t]*(?:\n+|$)/;
+
 const READER_MATH_INLINE_PAREN_REGEX = /^\\\(([\s\S]+?)\\\)/;
+
 const READER_MATH_BLOCK_START_REGEX = /(?:^|\n)(?:\$\$|\\\[)/;
+
 const READER_MATH_INLINE_START_REGEX = /(?:\$|\\\()/;
 
 type InlineDollarMathExpressionMatch = {

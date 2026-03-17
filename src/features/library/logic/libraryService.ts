@@ -50,7 +50,9 @@ function toSlugPart(value: string): string {
 
 function createLibraryItemId(seedTitle: string): LibraryItemId {
   const now = Date.now();
+
   const slug = toSlugPart(seedTitle) || "article";
+
   const randomPart = Math.random().toString(36).slice(2, 8);
   return `${now}-${slug}-${randomPart}`;
 }

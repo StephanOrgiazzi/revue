@@ -28,6 +28,7 @@ export function ControlsSheetSettingsContent({
 }: ControlsSheetSettingsContentProps) {
   const shouldRenderMarkdownTextSize =
     canShowMarkdownTextSizeSelection && activeMarkdownTextSizeLevel !== undefined;
+
   const shouldRenderThemeSelection =
     canShowThemeSelection && themeOptions !== undefined && activeThemeId !== undefined;
 

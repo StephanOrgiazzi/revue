@@ -15,9 +15,13 @@ export function useReaderFloatingMenuVisibility({
   isEnabled,
 }: UseReaderFloatingMenuVisibilityParams): UseReaderFloatingMenuVisibilityResult {
   const [isFloatingMenuButtonVisible, setIsFloatingMenuButtonVisibleState] = useState(true);
+
   const isFloatingMenuButtonVisibleRef = useRef(true);
+
   const previousScrollOffsetYRef = useRef(0);
+
   const hideThresholdAnchorOffsetYRef = useRef(0);
+
   const hasInitializedAnchorRef = useRef(false);
 
   const setIsFloatingMenuButtonVisible = useCallback((isVisible: boolean) => {
@@ -39,6 +43,7 @@ export function useReaderFloatingMenuVisibility({
   const handleScrollOffsetChange = useCallback(
     (scrollOffsetY: number) => {
       const currentOffsetY = Math.max(0, scrollOffsetY);
+
       const previousOffsetY = previousScrollOffsetYRef.current;
       previousScrollOffsetYRef.current = currentOffsetY;
 

@@ -7,6 +7,7 @@ import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 describe("ReaderEmptyState", () => {
   it("renders empty message with expected typography and width", () => {
     const { getByText } = render(<ReaderEmptyState theme={lightTheme} contentWidth={420} />);
+
     const message = getByText("This article is empty.");
 
     expect(message).toBeVisible();

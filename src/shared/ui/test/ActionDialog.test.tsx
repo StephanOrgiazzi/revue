@@ -27,7 +27,9 @@ describe("ActionDialog", () => {
 
   it("renders content and executes default action with haptic feedback", () => {
     const onClose = jest.fn();
+
     const onDelete = jest.fn();
+
     const { getByText } = render(
       <ActionDialog
         visible
@@ -55,7 +57,9 @@ describe("ActionDialog", () => {
 
   it("does not trigger haptic feedback for cancel action", () => {
     const onClose = jest.fn();
+
     const onCancel = jest.fn();
+
     const { getByText, queryByText } = render(
       <ActionDialog
         visible

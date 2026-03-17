@@ -17,7 +17,9 @@ import { READER_MATH_MARKED_EXTENSION } from "@/features/reader/logic/markdown/m
 import type { ReaderHeadingRenderToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MARKDOWN_RENDERER = new Renderer();
+
 const ALLOWED_ABSOLUTE_IMAGE_PROTOCOLS = new Set(["http:", "https:", "file:"]);
+
 const SYNTHETIC_WEB_ORIGIN = "https://revue.local";
 let activeMarkdownSourceUri: string | undefined;
 
@@ -90,10 +92,14 @@ function highlightCodeHtml(text: string, language: string): string {
 
 READER_MARKDOWN_RENDERER.heading = function ({ depth, tokens, ...token }) {
   const normalizedHeadingLevel = normalizeHeadingLevel(depth);
+
   const headingText = this.parser.parseInline(tokens);
+
   const headingClassNames = (token as ReaderHeadingRenderToken).readerClassNames ?? [];
+
   const headingClassAttribute =
     headingClassNames.length > 0 ? ` class="${headingClassNames.join(" ")}"` : "";
+
   const headingHtml = `<h${normalizedHeadingLevel}${headingClassAttribute}>${headingText}</h${normalizedHeadingLevel}>`;
 
   if (normalizedHeadingLevel === 2) {
@@ -113,11 +119,13 @@ READER_MARKDOWN_RENDERER.blockquote = function ({ tokens }) {
 
 READER_MARKDOWN_RENDERER.code = function ({ text, lang }) {
   const normalizedLanguageClassName = normalizeCodeLanguageClassName(lang);
+
   const codeClassNames = [READER_CODE_BLOCK_CONTENT_CLASS_NAME, "hljs"];
   if (normalizedLanguageClassName) {
     codeClassNames.push(`language-${normalizedLanguageClassName}`);
   }
   const codeClassName = codeClassNames.join(" ");
+
   const highlightedCodeHtml = highlightCodeHtml(text, normalizedLanguageClassName);
 
   return `<pre class="${READER_CODE_BLOCK_CLASS_NAME}"><code class="${codeClassName}">${highlightedCodeHtml}</code></pre>\n`;
@@ -134,6 +142,7 @@ READER_MARKDOWN_RENDERER.image = function ({ href, title, text }) {
   }
 
   const escapedAltText = escapeHtml(text ?? "");
+
   const escapedTitleText = title?.trim() ? ` title="${escapeHtml(title.trim())}"` : "";
   return `<img src="${escapeHtml(normalizedImageHref)}" alt="${escapedAltText}"${escapedTitleText}>`;
 };

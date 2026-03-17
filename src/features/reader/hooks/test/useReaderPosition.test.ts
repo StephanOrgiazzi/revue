@@ -40,6 +40,7 @@ describe("useReaderPosition", () => {
     });
     (resolveHeadingForScrollOffset as jest.Mock).mockReturnValue(tocHeadings[2]);
     const scrollTo = jest.fn();
+
     const { result } = renderHook(() =>
       useReaderPosition({
         articleId: "a-1",
@@ -67,6 +68,7 @@ describe("useReaderPosition", () => {
       scrollOffsetY: null,
     });
     const scrollTo = jest.fn();
+
     const { result } = renderHook(() =>
       useReaderPosition({
         articleId: "a-2",
@@ -90,6 +92,7 @@ describe("useReaderPosition", () => {
 
   it("selecting headings scrolls to top or block offset", () => {
     const scrollTo = jest.fn();
+
     const { result } = renderHook(() =>
       useReaderPosition({
         articleId: "a-3",

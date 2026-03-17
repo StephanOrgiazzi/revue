@@ -9,7 +9,7 @@
 [![Bun](https://img.shields.io/badge/Bun-1.x-F9F1E1?logo=bun&logoColor=111111)](https://bun.sh/)
 [![Jest](https://img.shields.io/badge/Tests-Jest-C21325?logo=jest&logoColor=white)](https://jestjs.io/)
 [![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-0E7C86)](#mobile-usage-androidios)
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-green)](#open-source)
 
 > Read markdown like an article, not a raw text file.
@@ -120,4 +120,3 @@ bunx eas-cli build -p android --profile preview
 ## Project docs
 
 - [Contributing](docs/CONTRIBUTING.md)
-- [Contributor License Agreement](docs/CLA.md)

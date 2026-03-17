@@ -1,7 +1,11 @@
 const URI_SCHEME_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
+
 const ABSOLUTE_POSIX_PATH_PATTERN = /^\/(?!\/)/;
+
 const FILE_SINGLE_SLASH_SCHEME_PATTERN = /^file:\/(?!\/)/i;
+
 const CONTENT_SINGLE_SLASH_SCHEME_PATTERN = /^content:\/(?!\/)/i;
+
 const INVALID_FILE_NAME_CHARACTER_PATTERN = /[<>:"/\\|?*]/;
 
 export function stripQueryAndFragment(uri: string): string {
@@ -47,6 +51,7 @@ export function decodeUriSegment(segment: string): string {
 
 function sanitizeUriDerivedFileName(segment: string): string {
   const baseName = segment.split(/[\\/:]/).pop() ?? "";
+
   const sanitizedBaseName = sanitizeFileNameCharacters(baseName).replace(/\.+$/g, "").trim() || "";
 
   return sanitizedBaseName === "." || sanitizedBaseName === ".." ? "" : sanitizedBaseName;
@@ -54,6 +59,7 @@ function sanitizeUriDerivedFileName(segment: string): string {
 
 export function sanitizeAssetFileName(fileName: string, fallbackName: string): string {
   const trimmedFileName = fileName.trim();
+
   const sanitizedName =
     sanitizeFileNameCharacters(trimmedFileName).replace(/\.+$/g, "").trim() || "";
 
@@ -73,9 +79,13 @@ function sanitizeFileNameCharacters(value: string): string {
 
 export function extractFileNameFromUri(uri: string): string {
   const normalizedUri = stripQueryAndFragment(uri).replace(/\/+$/, "");
+
   const pathSegments = normalizedUri.split("/");
+
   const lastPathSegment = pathSegments[pathSegments.length - 1];
+
   const decodedSegment = decodeUriSegment(lastPathSegment).trim();
+
   const normalizedFileName = sanitizeUriDerivedFileName(decodedSegment);
 
   if (!normalizedFileName) {
@@ -89,9 +99,13 @@ export function extractFileNameFromUri(uri: string): string {
 
 export function extractAssetFileNameFromUri(uri: string): string {
   const normalizedUri = stripQueryAndFragment(uri).replace(/\/+$/, "");
+
   const pathSegments = normalizedUri.split("/");
+
   const lastPathSegment = pathSegments[pathSegments.length - 1];
+
   const decodedSegment = decodeUriSegment(lastPathSegment).trim();
+
   const normalizedFileName = sanitizeUriDerivedFileName(decodedSegment);
 
   return normalizedFileName || "asset";
@@ -122,14 +136,18 @@ export function isRelativeMarkdownAssetHref(href: string): boolean {
 
 export function splitRelativeHref(relativeHref: string): { path: string; suffix: string } {
   const match = relativeHref.match(/^[^?#]*/);
+
   const path = match?.[0] ?? relativeHref;
+
   const suffix = relativeHref.slice(path.length);
   return { path, suffix };
 }
 
 function extractAndroidSafEncodedDocumentId(uri: string): string | null {
   const normalizedUri = stripQueryAndFragment(uri).replace(/\/+$/g, "");
+
   const documentMarker = "/document/";
+
   const documentMarkerIndex = normalizedUri.indexOf(documentMarker);
   if (documentMarkerIndex < 0) {
     return null;
@@ -140,7 +158,9 @@ function extractAndroidSafEncodedDocumentId(uri: string): string | null {
 
 function extractAndroidSafEncodedTreeId(uri: string): string | null {
   const normalizedUri = stripQueryAndFragment(uri).replace(/\/+$/g, "");
+
   const treeMarker = "/tree/";
+
   const treeMarkerIndex = normalizedUri.indexOf(treeMarker);
   if (treeMarkerIndex < 0) {
     return null;
@@ -160,7 +180,9 @@ function parseAndroidSafPathSegmentsFromEncodedId(encodedId: string | null): str
   }
 
   const pathStartIndex = decodedId.indexOf(":");
+
   const relativePath = pathStartIndex >= 0 ? decodedId.slice(pathStartIndex + 1) : decodedId;
+
   const normalizedPath = relativePath.trim();
   if (!normalizedPath) {
     return [];

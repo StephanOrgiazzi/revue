@@ -140,6 +140,7 @@ function buildThemeColors(
   colorOverrides: Partial<ThemeColors> = {},
 ): ThemeColors {
   const surfaceMuted = palette.surfaceMuted ?? palette.surface;
+
   const accentSecondary = palette.accentSecondary ?? palette.accent;
 
   return {

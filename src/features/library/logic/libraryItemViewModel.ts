@@ -49,12 +49,16 @@ export function buildCardPalettesForGrid(
   options: BuildCardPalettesOptions = {},
 ): Record<LibraryItemId, CardPalette> {
   const columnCount = Math.max(1, options.columnCount ?? 2);
+
   const leadingCellCount = Math.max(0, options.leadingCellCount ?? 1);
+
   const paletteIndexByGridCell: Record<number, number> = {};
+
   const paletteByItemId: Record<LibraryItemId, CardPalette> = {};
 
   items.forEach((item, itemIndex) => {
     const gridCellIndex = leadingCellCount + itemIndex;
+
     const forbiddenPaletteIndices = new Set<number>();
 
     if (gridCellIndex % columnCount !== 0) {
@@ -72,6 +76,7 @@ export function buildCardPalettesForGrid(
     }
 
     const preferredPaletteIndex = hashString(item.title) % CARD_PALETTES.length;
+
     const selectedPaletteIndex =
       forbiddenPaletteIndices.size < CARD_PALETTES.length
         ? (Array.from(

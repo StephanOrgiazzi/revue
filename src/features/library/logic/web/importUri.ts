@@ -2,6 +2,7 @@ import * as Linking from "expo-linking";
 import { Platform } from "react-native";
 
 const DIRECT_IMPORT_URI_PREFIXES = ["content://", "file://"] as const;
+
 const WEB_IMPORT_URI_PREFIXES = ["/", "http://", "https://", "blob:", "data:"] as const;
 
 function hasPrefix(value: string, prefixes: readonly string[]): boolean {
@@ -31,10 +32,13 @@ export function resolveIncomingImportUri(url: string | null): string | null {
   }
 
   const { queryParams } = Linking.parse(trimmedUrl);
+
   const importUriQueryParam = queryParams?.importUri;
+
   const importUri = Array.isArray(importUriQueryParam)
     ? importUriQueryParam[0]
     : importUriQueryParam;
+
   const trimmedImportUri = typeof importUri === "string" ? importUri.trim() : "";
 
   if (!trimmedImportUri || !isSupportedImportUri(trimmedImportUri)) {

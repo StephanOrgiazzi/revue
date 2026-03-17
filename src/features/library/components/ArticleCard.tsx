@@ -19,11 +19,14 @@ type ArticleCardProps = {
 export const ArticleCard = memo(
   ({ article, palette, disabled = false, onPress, onLongPress }: ArticleCardProps) => {
     const cardPalette = palette ?? cardPaletteForTitle(article.title);
+
     const formattedImportDate = formatArticleDate(article.createdAt);
 
     return (
       <Pressable
         disabled={disabled}
+        accessibilityRole="button"
+        accessibilityLabel={article.title}
         onPress={() => onPress(article.id)}
         onLongPress={() => onLongPress(article)}
         className={`h-[180px] w-full overflow-hidden rounded-[13px] ${disabled ? "opacity-70" : ""}`}

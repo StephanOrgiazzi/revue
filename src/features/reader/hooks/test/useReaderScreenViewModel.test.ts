@@ -43,6 +43,7 @@ jest.mock("@/features/reader/logic/readerTableOfContents", () => ({
 describe("useReaderScreenViewModel", () => {
   it("builds reader view-model for non-empty content", () => {
     const theme = getTheme("light");
+
     const { result } = renderHook(() =>
       useReaderScreenViewModel({
         articleTitle: "My Article",
@@ -76,6 +77,7 @@ describe("useReaderScreenViewModel", () => {
 
   it("falls back when title/content are missing and clamps content width", () => {
     const theme = getTheme("paper");
+
     const { result } = renderHook(() =>
       useReaderScreenViewModel({
         articleTitle: undefined,

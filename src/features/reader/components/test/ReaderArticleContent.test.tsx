@@ -67,7 +67,7 @@ describe("ReaderArticleContent", () => {
   });
 
   it("renders html blocks and reports layout", () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <ReaderArticleContent
         {...baseProps}
         isLoading={false}
@@ -79,5 +79,6 @@ describe("ReaderArticleContent", () => {
 
     expect(getAllByText("HTML:<p>A</p>")).toHaveLength(2);
     expect(getByText("Header")).toBeTruthy();
+    expect(getByTestId("reader-article-scroll")).toHaveProp("showsVerticalScrollIndicator", false);
   });
 });

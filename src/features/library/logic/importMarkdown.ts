@@ -71,6 +71,7 @@ function extractTitle(
   }
 
   const h1Match = markdownBody.match(/^#\s+(.+)$/m);
+
   const h1Title = h1Match?.[1]?.trim();
   if (h1Title) {
     return h1Title;
@@ -146,6 +147,7 @@ async function readAndPersistImportedMarkdown(
   }
 
   const rawMarkdown = await destinationFile.text();
+
   const rewrittenMarkdown = await copyLocalMarkdownAssets(
     rawMarkdown,
     normalizedPickedAssetUri,
@@ -169,7 +171,9 @@ export async function finalizeMarkdownImport(
   assertMarkdownFileName(pickedAsset.name);
 
   const { rawMarkdown, localPath } = await readAndPersistImportedMarkdown(pickedAsset, options.id);
+
   const parsedMarkdown = parseMarkdownDocument(rawMarkdown);
+
   const title = extractTitle(parsedMarkdown.content, pickedAsset.name, parsedMarkdown.data.title);
 
   return createLibraryItem({

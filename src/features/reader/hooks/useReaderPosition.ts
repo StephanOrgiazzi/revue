@@ -82,19 +82,30 @@ export function useReaderPosition({
   isLoading,
 }: UseReaderPositionParams): UseReaderPositionResult {
   const [initialRestoreState] = useState<RestoreState>(() => resolveRestoreState(articleId));
+
   const { storedReadingPosition: initialStoredReadingPosition, restorePhase: initialRestorePhase } =
     initialRestoreState;
+
   const articleScrollRef = useRef<ScrollView>(null);
+
   const blockOffsetsRef = useRef<Record<number, number>>({});
+
   const restorePhaseRef = useRef<RestorePhase>(initialRestorePhase);
+
   const storedReadingPositionRef = useRef<StoredReadingPosition>(initialStoredReadingPosition);
+
   const activeHeadingSlugRef = useRef<ActiveHeadingSlug>(null);
+
   const currentScrollOffsetYRef = useRef(0);
+
   const hasMeasuredContentRef = useRef(false);
+
   const [restorePhase, setRestorePhaseState] = useState<RestorePhase>(initialRestorePhase);
+
   const [storedReadingPosition, setStoredReadingPosition] = useState<StoredReadingPosition>(
     initialStoredReadingPosition,
   );
+
   const [activeHeadingSlug, setActiveHeadingSlug] = useState<ActiveHeadingSlug>(null);
 
   const setRestorePhase = useCallback((phase: RestorePhase) => {
@@ -148,6 +159,7 @@ export function useReaderPosition({
     }
 
     const storedAnchorSlug = storedReadingPositionRef.current.anchorSlug;
+
     const nextHeadingSlug =
       storedAnchorSlug && tocHeadings.some((heading) => heading.slug === storedAnchorSlug)
         ? storedAnchorSlug
@@ -304,6 +316,7 @@ export function useReaderPosition({
         tocHeadings,
         blockOffsetsRef.current,
       );
+
       const nextHeadingSlug = activeHeading?.slug ?? null;
       setResolvedActiveHeadingSlug(nextHeadingSlug);
     },
@@ -320,16 +333,22 @@ export function useReaderPosition({
   }, [isLoading, restoreStoredReadingPositionIfReady]);
 
   const isReadingPositionRestoreReady = restorePhase === "ready";
+
   const { anchorSlug: storedAnchorSlug, scrollOffsetY: storedScrollOffsetY } =
     storedReadingPosition;
+
   const isRestoringFromAnchorOnly = storedScrollOffsetY === null;
+
   const isRestoringToFirstHeadingAnchor =
     Boolean(storedAnchorSlug && tocHeadings[0] && tocHeadings[0].slug === storedAnchorSlug) &&
     isRestoringFromAnchorOnly;
+
   const isRestoringToTopPosition =
     (storedScrollOffsetY !== null && storedScrollOffsetY <= 0) || isRestoringToFirstHeadingAnchor;
+
   const isRestoringReadingPosition =
     !isLoading && !isReadingPositionRestoreReady && !isRestoringToTopPosition;
+
   const shouldSuppressListHeader = !isReadingPositionRestoreReady && !isRestoringToTopPosition;
 
   return {

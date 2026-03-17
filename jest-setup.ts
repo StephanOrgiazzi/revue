@@ -78,7 +78,9 @@ global.fetch = jest.fn((url: string) => {
     try {
       // Trim leading slash and join with project root (where public/ exists)
       const relativePath = url.startsWith("/") ? url.slice(1) : url;
+
       const absolutePath = path.join(__dirname, "public", relativePath);
+
       const content = fs.readFileSync(absolutePath, "utf8");
 
       return Promise.resolve({

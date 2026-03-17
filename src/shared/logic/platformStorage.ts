@@ -4,10 +4,12 @@ import { Platform } from "react-native";
 import { createWebStorage } from "@/shared/logic/web/storage";
 
 const DEFAULT_STORAGE_DIRECTORY = "storage";
+
 const STORAGE_DIRECTORY_CREATE_OPTIONS = {
   idempotent: true,
   intermediates: true,
 } as const;
+
 const STORAGE_FILE_CREATE_OPTIONS = {
   intermediates: true,
 } as const;
@@ -41,7 +43,9 @@ const reportStorageError: ReportStorageError = (operation, storagePath, error) =
 
 function createNativeStorage(directoryName: string, fileName: string): StorageAdapter {
   const storageDirectory = new Directory(Paths.document, directoryName);
+
   const storageFile = new File(storageDirectory, fileName);
+
   const storagePath = `${directoryName}/${fileName}`;
   let hasCachedValue = false;
   let cachedValue: string | undefined;

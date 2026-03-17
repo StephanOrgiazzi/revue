@@ -32,6 +32,7 @@ describe("useMarkdownTextSizeSlider", () => {
 
   it("returns layout and style helpers", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 3,
@@ -48,6 +49,7 @@ describe("useMarkdownTextSizeSlider", () => {
 
   it("updates track width from layout", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 5,
@@ -66,6 +68,7 @@ describe("useMarkdownTextSizeSlider", () => {
 
   it("does not emit selection until gesture ends", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 2,
@@ -94,6 +97,7 @@ describe("useMarkdownTextSizeSlider", () => {
 
   it("clamped and snaps touch values into supported levels on release", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 3,
@@ -120,6 +124,7 @@ describe("useMarkdownTextSizeSlider", () => {
 
   it("ignores non-finite gesture coordinates and keeps the current level", () => {
     const onSelectMarkdownTextSizeLevel = jest.fn();
+
     const { result } = renderHook(() =>
       useMarkdownTextSizeSlider({
         activeMarkdownTextSizeLevel: 3,

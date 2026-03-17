@@ -25,6 +25,7 @@ describe("libraryIndexStorage", () => {
 
   it("should parse and return library index from storage", () => {
     const { getLibraryIndex } = require(".././libraryIndexStorage");
+
     const index = { id1: { id: "id1", title: "Title", tags: ["t1"] } };
     mockStorage.read.mockReturnValue(JSON.stringify(index));
 
@@ -35,6 +36,7 @@ describe("libraryIndexStorage", () => {
 
   it("should save library index to storage", () => {
     const { saveLibraryIndex } = require(".././libraryIndexStorage");
+
     const index = { id2: { id: "id2", title: "Save me", tags: [] } };
 
     saveLibraryIndex(index);
