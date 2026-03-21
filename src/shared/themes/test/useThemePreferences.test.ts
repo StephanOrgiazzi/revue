@@ -1,5 +1,5 @@
-import React from "react";
 import { act, renderHook } from "@testing-library/react-native";
+import React from "react";
 
 type MockStorage = {
   read: jest.Mock<string | undefined, []>;
@@ -19,7 +19,8 @@ function setupModule(readValue?: string) {
     createPlatformStorage: jest.fn(() => storage),
   }));
 
-  const module = require(".././useThemePreferences") as typeof import(".././useThemePreferences");
+  const module =
+    require("@/shared/themes/useThemePreferences") as typeof import("@/shared/themes/useThemePreferences");
   return {
     useThemePreferences: module.useThemePreferences,
     storage,

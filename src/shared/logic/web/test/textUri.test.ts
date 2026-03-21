@@ -1,4 +1,4 @@
-import { canReadTextFromWebUri, readTextFromWebUri } from ".././textUri";
+import { canReadTextFromWebUri, readTextFromWebUri } from "@/shared/logic/web/textUri";
 
 describe("textUri", () => {
   describe("canReadTextFromWebUri", () => {

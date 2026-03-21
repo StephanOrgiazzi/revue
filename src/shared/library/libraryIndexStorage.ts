@@ -1,4 +1,5 @@
-import type { LibraryIndex, LibraryItem } from "@/features/library/logic/types";
+import type { LibraryIndex, LibraryItem } from "@/shared/library/types";
+
 import { createPlatformStorage } from "@/shared/logic/platformStorage";
 
 const LIBRARY_INDEX_KEY = "library_index";
@@ -8,23 +9,6 @@ let cachedParsedLibraryIndex: LibraryIndex = {};
 const storage = createPlatformStorage({
   key: LIBRARY_INDEX_KEY,
 });
-
-function cloneLibraryItem(item: LibraryItem): LibraryItem {
-  return {
-    ...item,
-    tags: [...item.tags],
-  };
-}
-
-function cloneLibraryIndex(index: LibraryIndex): LibraryIndex {
-  const clonedIndex: LibraryIndex = {};
-
-  for (const [id, item] of Object.entries(index)) {
-    clonedIndex[id] = cloneLibraryItem(item);
-  }
-
-  return clonedIndex;
-}
 
 export function getLibraryIndex(): LibraryIndex {
   const raw = storage.read();
@@ -53,4 +37,21 @@ export function saveLibraryIndex(index: LibraryIndex): void {
   cachedRawLibraryIndex = serializedIndex;
   cachedParsedLibraryIndex = cloneLibraryIndex(index);
   storage.write(serializedIndex);
+}
+
+function cloneLibraryIndex(index: LibraryIndex): LibraryIndex {
+  const clonedIndex: LibraryIndex = {};
+
+  for (const [id, item] of Object.entries(index)) {
+    clonedIndex[id] = cloneLibraryItem(item);
+  }
+
+  return clonedIndex;
+}
+
+function cloneLibraryItem(item: LibraryItem): LibraryItem {
+  return {
+    ...item,
+    tags: [...item.tags],
+  };
 }

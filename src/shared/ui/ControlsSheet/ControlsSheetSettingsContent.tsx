@@ -1,7 +1,7 @@
 import { View } from "react-native";
 
-import type { MarkdownTextSizeLevel } from "@/shared/themes/markdownTextSize";
-import type { Theme, ThemeId, ThemeOption } from "@/shared/themes/themes";
+import type { MarkdownTextSizeLevel, Theme, ThemeId, ThemeOption } from "@/shared/themes/types";
+
 import { MarkdownTextSizeSection } from "@/shared/ui/MarkdownTextSizeSection";
 import { ThemeSelectionSection } from "@/shared/ui/ThemeSelectionSection";
 

@@ -1,10 +1,18 @@
 import type { ReactNode, RefObject } from "react";
 import type { ScrollViewProps } from "react-native";
+
 import { ScrollView, View } from "react-native";
 import { RenderHTMLSource } from "react-native-render-html";
 
 import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
 import { useThemePreferences } from "@/shared/themes/useThemePreferences";
+
+type HtmlBlockItemProps = {
+  htmlBlock: string;
+  htmlContentWidth: number;
+  blockIndex: number;
+  onBlockLayout: (blockIndex: number, blockY: number) => void;
+};
 
 type ReaderArticleContentProps = {
   articleScrollRef: RefObject<ScrollView | null>;
@@ -29,32 +37,6 @@ type ReaderArticleContentProps = {
   htmlBlocks: string[];
   onBlockLayout: (blockIndex: number, blockY: number) => void;
 };
-
-type HtmlBlockItemProps = {
-  htmlBlock: string;
-  htmlContentWidth: number;
-  blockIndex: number;
-  onBlockLayout: (blockIndex: number, blockY: number) => void;
-};
-
-function HtmlBlockItem({
-  htmlBlock,
-  htmlContentWidth,
-  blockIndex,
-  onBlockLayout,
-}: HtmlBlockItemProps) {
-  return (
-    <View
-      onLayout={(event) => {
-        onBlockLayout(blockIndex, event.nativeEvent.layout.y);
-      }}
-    >
-      <View style={{ width: htmlContentWidth }}>
-        <RenderHTMLSource contentWidth={htmlContentWidth} source={{ html: htmlBlock }} />
-      </View>
-    </View>
-  );
-}
 
 export function ReaderArticleContent({
   articleScrollRef,
@@ -114,5 +96,24 @@ export function ReaderArticleContent({
         })
       )}
     </ScrollView>
+  );
+}
+
+function HtmlBlockItem({
+  htmlBlock,
+  htmlContentWidth,
+  blockIndex,
+  onBlockLayout,
+}: HtmlBlockItemProps) {
+  return (
+    <View
+      onLayout={(event) => {
+        onBlockLayout(blockIndex, event.nativeEvent.layout.y);
+      }}
+    >
+      <View style={{ width: htmlContentWidth }}>
+        <RenderHTMLSource contentWidth={htmlContentWidth} source={{ html: htmlBlock }} />
+      </View>
+    </View>
   );
 }

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
 import type { CustomBlockRenderer } from "react-native-render-html";
-import { useContentWidth, useNormalizedUrl } from "react-native-render-html";
+
+import { useEffect, useMemo, useState } from "react";
 import { Image, ScrollView, Text, View, type ImageLoadEvent } from "react-native";
+import { useContentWidth, useNormalizedUrl } from "react-native-render-html";
 
 import {
   READER_IMAGE_BORDERLESS_STYLE,

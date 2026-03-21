@@ -4,10 +4,6 @@ import { useReaderScreenViewModel } from "@/features/reader/hooks/useReaderScree
 import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 import { getTheme } from "@/shared/themes/themes";
 
-jest.mock("@/features/reader/components/ReaderHtmlRenderers", () => ({
-  readerHtmlRenderers: { custom: "renderers" },
-}));
-
 jest.mock("@/features/reader/logic/readerHtmlStyles", () => ({
   createReaderHtmlStyles: jest.fn(() => ({ baseStyle: {}, tagsStyles: {}, classesStyles: {} })),
 }));
@@ -66,7 +62,6 @@ describe("useReaderScreenViewModel", () => {
       { slug: "title", text: "My Article", level: 1, blockIndex: -1 },
     ]);
     expect(result.current.pageBackgroundColor).toBe(theme.colors.pageBackground);
-    expect(result.current.htmlRenderers).toEqual({ custom: "renderers" });
     expect(result.current.htmlSystemFonts).toEqual(["System", "monospace"]);
     expect(renderMarkdownToHtmlBlocksWithHeadings).toHaveBeenCalledWith(
       "# Hello",

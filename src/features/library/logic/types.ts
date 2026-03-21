@@ -1,14 +1,9 @@
-export type LibraryItemId = string;
-
-export type LibraryItem = {
-  id: LibraryItemId;
-  title: string;
-  localPath: string;
-  tags: string[];
-  createdAt: string;
-  lastAnchorSlug: string | null;
-  lastScrollOffsetY: number | null;
-  readingProgress: number;
+export type CardPalette = {
+  backgroundColor: string;
+  highlightColor: string;
 };
 
-export type LibraryIndex = Record<LibraryItemId, LibraryItem>;
+export type PickedMarkdownAsset = {
+  name: string;
+  uri: string;
+};

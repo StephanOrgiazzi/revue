@@ -1,7 +1,6 @@
 import "@testing-library/jest-native/extend-expect";
 import fs from "fs";
 import path from "path";
-
 // 1) React Native Gesture Handler (required for many navigation/gesture libs)
 import "react-native-gesture-handler/jestSetup";
 

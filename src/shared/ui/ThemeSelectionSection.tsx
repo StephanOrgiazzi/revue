@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
-import type { Theme, ThemeId, ThemeOption } from "@/shared/themes/themes";
+import type { Theme, ThemeId, ThemeOption } from "@/shared/themes/types";
 
 type ThemeSelectionSectionProps = {
   theme: Theme;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Animated, Easing, Pressable, Text } from "react-native";
 
-import type { Theme } from "@/shared/themes/themes";
+import type { Theme } from "@/shared/themes/types";
 
 const FAB_ENTRANCE_OFFSET_PX = 18;
 

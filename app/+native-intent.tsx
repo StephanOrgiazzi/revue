@@ -7,28 +7,50 @@ type RedirectSystemPathParams = {
   initial: boolean;
 };
 
-function normalizePath(path: string): string {
-  if (!path) {
+export function redirectSystemPath({ path }: RedirectSystemPathParams): string {
+  try {
+    const trimmedPath = path.trim();
+    if (!trimmedPath) {
+      return "/";
+    }
+
+    if (trimmedPath.startsWith("content://") || trimmedPath.startsWith("file://")) {
+      return toImportRoute(trimmedPath);
+    }
+
+    if (trimmedPath.startsWith("/")) {
+      if (isAppRoutePath(trimmedPath)) {
+        return trimmedPath;
+      }
+
+      const contentUri = contentUriFromPath(trimmedPath);
+      if (contentUri) {
+        return toImportRoute(contentUri);
+      }
+
+      const fileUri = fileUriFromPath(trimmedPath);
+      return fileUri ? toImportRoute(fileUri) : trimmedPath;
+    }
+
+    const parsedUrl = new URL(trimmedPath, "revuemd://");
+
+    const protocol = parsedUrl.protocol.toLowerCase();
+
+    if (protocol === "content:" || protocol === "file:") {
+      return toImportRoute(parsedUrl.toString());
+    }
+
+    if (protocol === "revuemd:") {
+      const importUri = importUriFromRevuemdUrl(parsedUrl);
+      if (importUri) {
+        return toImportRoute(importUri);
+      }
+    }
+
+    return path;
+  } catch {
     return "/";
   }
-
-  return path.startsWith("/") ? path : `/${path}`;
-}
-
-function isAppRoutePath(pathname: string): boolean {
-  const normalizedPath = normalizePath(pathname);
-
-  if (normalizedPath === "/" || normalizedPath === "/index") {
-    return true;
-  }
-
-  return APP_ROUTE_PREFIXES.some(
-    (prefix) => normalizedPath === prefix || normalizedPath.startsWith(`${prefix}/`),
-  );
-}
-
-function toImportRoute(uri: string): string {
-  return `/?importUri=${encodeURIComponent(uri)}`;
 }
 
 function contentUriFromPath(path: string): string | null {
@@ -83,48 +105,26 @@ function importUriFromRevuemdUrl(url: URL): string | null {
   return fileUri ? `${fileUri}${url.search}${url.hash}` : null;
 }
 
-export function redirectSystemPath({ path }: RedirectSystemPathParams): string {
-  try {
-    const trimmedPath = path.trim();
-    if (!trimmedPath) {
-      return "/";
-    }
+function isAppRoutePath(pathname: string): boolean {
+  const normalizedPath = normalizePath(pathname);
 
-    if (trimmedPath.startsWith("content://") || trimmedPath.startsWith("file://")) {
-      return toImportRoute(trimmedPath);
-    }
+  if (normalizedPath === "/" || normalizedPath === "/index") {
+    return true;
+  }
 
-    if (trimmedPath.startsWith("/")) {
-      if (isAppRoutePath(trimmedPath)) {
-        return trimmedPath;
-      }
+  return APP_ROUTE_PREFIXES.some(
+    (prefix) => normalizedPath === prefix || normalizedPath.startsWith(`${prefix}/`),
+  );
+}
 
-      const contentUri = contentUriFromPath(trimmedPath);
-      if (contentUri) {
-        return toImportRoute(contentUri);
-      }
-
-      const fileUri = fileUriFromPath(trimmedPath);
-      return fileUri ? toImportRoute(fileUri) : trimmedPath;
-    }
-
-    const parsedUrl = new URL(trimmedPath, "revuemd://");
-
-    const protocol = parsedUrl.protocol.toLowerCase();
-
-    if (protocol === "content:" || protocol === "file:") {
-      return toImportRoute(parsedUrl.toString());
-    }
-
-    if (protocol === "revuemd:") {
-      const importUri = importUriFromRevuemdUrl(parsedUrl);
-      if (importUri) {
-        return toImportRoute(importUri);
-      }
-    }
-
-    return path;
-  } catch {
+function normalizePath(path: string): string {
+  if (!path) {
     return "/";
   }
+
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
+function toImportRoute(uri: string): string {
+  return `/?importUri=${encodeURIComponent(uri)}`;
 }

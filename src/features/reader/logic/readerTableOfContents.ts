@@ -1,4 +1,4 @@
-import type { ReaderHeading } from "@/features/reader/logic/markdownRenderer";
+import type { ReaderHeading } from "@/features/reader/logic/markdown/types";
 
 const ACTIVE_HEADING_SCROLL_OFFSET = 24;
 
@@ -8,10 +8,6 @@ const TITLE_TOC_ANCHOR_SLUG = "reader-title-anchor";
 export const TITLE_TOC_BLOCK_INDEX = -1;
 
 type BlockOffsetsByIndex = Record<number, number>;
-
-export function resolveAnchorScrollOffset(blockOffset: number): number {
-  return Math.max(0, blockOffset - ANCHOR_SCROLL_ALIGNMENT_OFFSET);
-}
 
 export function buildReaderTocHeadings(
   headings: ReaderHeading[],
@@ -31,6 +27,10 @@ export function buildReaderTocHeadings(
   };
 
   return [titleHeading, ...headings];
+}
+
+export function resolveAnchorScrollOffset(blockOffset: number): number {
+  return Math.max(0, blockOffset - ANCHOR_SCROLL_ALIGNMENT_OFFSET);
 }
 
 export function resolveHeadingForScrollOffset(

@@ -3,7 +3,7 @@ import {
   buildReaderTocHeadings,
   resolveHeadingForScrollOffset,
   TITLE_TOC_BLOCK_INDEX,
-} from ".././readerTableOfContents";
+} from "@/features/reader/logic/readerTableOfContents";
 
 describe("readerTableOfContents", () => {
   describe("resolveAnchorScrollOffset", () => {

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
+
 import {
   getSingleRouteParam,
   readArticleById,
   readArticleContent,
 } from "@/features/reader/logic/readerRepository";
+
+type ReaderArticleState = UseReaderArticleResult;
 
 type UseReaderArticleResult = {
   article: LibraryItem | null;
@@ -13,12 +16,6 @@ type UseReaderArticleResult = {
   errorMessage: string | null;
   isLoading: boolean;
 };
-
-type ReaderArticleState = UseReaderArticleResult;
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === "AbortError";
-}
 
 export function useReaderArticle(
   routeId: LibraryItemId | LibraryItemId[] | undefined,
@@ -97,4 +94,8 @@ export function useReaderArticle(
   }, [articleId]);
 
   return state;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === "AbortError";
 }

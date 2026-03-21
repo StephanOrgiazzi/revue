@@ -1,5 +1,5 @@
+import { buildHtmlBlocksAndHeadings } from "@/features/reader/logic/markdown/chunking";
 import { DEFAULT_HTML_BLOCK_TARGET_MARKDOWN_CHARS } from "@/features/reader/logic/markdown/constants";
-import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 import {
   lexReaderMarkdown,
   renderReaderTokensToHtml,
@@ -8,7 +8,7 @@ import {
   annotateHeadingTokensWithRenderClasses,
   removeTitleDuplicateHeading,
 } from "@/features/reader/logic/markdown/tokenProcessing";
-import { buildHtmlBlocksAndHeadings } from "@/features/reader/logic/markdown/chunking";
+import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 
 jest.mock("@/features/reader/logic/markdown/markedRenderer", () => ({
   lexReaderMarkdown: jest.fn(),

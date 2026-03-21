@@ -23,10 +23,6 @@ export function normalizeCodeLanguageClassName(language: string | undefined): st
     .replace(/^-+|-+$/g, "");
 }
 
-export function normalizeMathExpression(expression: string): string {
-  return expression.replace(/\r\n?/g, "\n").trim();
-}
-
 export function normalizeComparableText(value: string): string {
   return value
     .toLowerCase()
@@ -37,4 +33,8 @@ export function normalizeComparableText(value: string): string {
 
 export function normalizeHeadingLevel(level: number): HeadingLevel {
   return Math.max(1, Math.min(6, Math.round(level))) as HeadingLevel;
+}
+
+export function normalizeMathExpression(expression: string): string {
+  return expression.replace(/\r\n?/g, "\n").trim();
 }

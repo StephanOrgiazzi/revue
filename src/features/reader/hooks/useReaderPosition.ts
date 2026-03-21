@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { type NativeScrollEvent, type NativeSyntheticEvent, type ScrollView } from "react-native";
 
+import type { ReaderHeading } from "@/features/reader/logic/markdown/types";
+import type { LibraryItemId } from "@/shared/library/types";
+
 import {
-  readLibraryItemReadingPosition,
-  saveLibraryItemReadingPosition,
-} from "@/features/library/logic/libraryRepository";
-import type { LibraryItemId } from "@/features/library/logic/types";
-import type { ReaderHeading } from "@/features/reader/logic/markdownRenderer";
+  readArticleReadingPosition,
+  saveArticleReadingPosition,
+} from "@/features/reader/logic/readerRepository";
 import {
   resolveAnchorScrollOffset,
   resolveHeadingForScrollOffset,
@@ -15,17 +16,42 @@ import {
 
 const MIN_SCROLL_OFFSET_TO_PERSIST_READING_POSITION = 120;
 
-type RestorePhase = "pending" | "ready";
 type ActiveHeadingSlug = string | null;
-
-type StoredReadingPosition = {
-  anchorSlug: ActiveHeadingSlug;
-  scrollOffsetY: number | null;
+type ReaderPositionRefs = {
+  blockOffsetsRef: React.MutableRefObject<Record<number, number>>;
+  restorePhaseRef: React.MutableRefObject<RestorePhase>;
+  storedReadingPositionRef: React.MutableRefObject<StoredReadingPosition>;
+  activeHeadingSlugRef: React.MutableRefObject<ActiveHeadingSlug>;
+  currentScrollOffsetYRef: React.MutableRefObject<number>;
+  hasMeasuredContentRef: React.MutableRefObject<boolean>;
 };
+
+type ReaderPositionState = {
+  refs: ReaderPositionRefs;
+  restorePhase: RestorePhase;
+  setRestorePhaseState: React.Dispatch<React.SetStateAction<RestorePhase>>;
+  storedReadingPosition: StoredReadingPosition;
+  setStoredReadingPosition: React.Dispatch<React.SetStateAction<StoredReadingPosition>>;
+  activeHeadingSlug: ActiveHeadingSlug;
+  setActiveHeadingSlug: React.Dispatch<React.SetStateAction<ActiveHeadingSlug>>;
+};
+
+type ReaderRestoreUiState = {
+  isReadingPositionRestoreReady: boolean;
+  isRestoringReadingPosition: boolean;
+  shouldSuppressListHeader: boolean;
+};
+
+type RestorePhase = "pending" | "ready";
 
 type RestoreState = {
   storedReadingPosition: StoredReadingPosition;
   restorePhase: RestorePhase;
+};
+
+type StoredReadingPosition = {
+  anchorSlug: ActiveHeadingSlug;
+  scrollOffsetY: number | null;
 };
 
 type UseReaderPositionParams = {
@@ -48,33 +74,6 @@ type UseReaderPositionResult = {
   persistReadingPosition: () => void;
 };
 
-function getStoredReadingPosition(articleId: LibraryItemId | undefined): StoredReadingPosition {
-  if (!articleId) {
-    return {
-      anchorSlug: null,
-      scrollOffsetY: null,
-    };
-  }
-
-  const { anchorSlug, scrollOffsetY } = readLibraryItemReadingPosition(articleId);
-  return {
-    anchorSlug,
-    scrollOffsetY,
-  };
-}
-
-function resolveRestorePhase(position: StoredReadingPosition): RestorePhase {
-  return position.anchorSlug === null && position.scrollOffsetY === null ? "ready" : "pending";
-}
-
-function resolveRestoreState(articleId: LibraryItemId | undefined): RestoreState {
-  const storedReadingPosition = getStoredReadingPosition(articleId);
-  return {
-    storedReadingPosition,
-    restorePhase: resolveRestorePhase(storedReadingPosition),
-  };
-}
-
 export function useReaderPosition({
   articleId,
   htmlBlocks,
@@ -88,25 +87,24 @@ export function useReaderPosition({
 
   const articleScrollRef = useRef<ScrollView>(null);
 
-  const blockOffsetsRef = useRef<Record<number, number>>({});
+  const {
+    refs,
+    restorePhase,
+    setRestorePhaseState,
+    storedReadingPosition,
+    setStoredReadingPosition,
+    activeHeadingSlug,
+    setActiveHeadingSlug,
+  } = useReaderPositionState(initialRestorePhase, initialStoredReadingPosition);
 
-  const restorePhaseRef = useRef<RestorePhase>(initialRestorePhase);
-
-  const storedReadingPositionRef = useRef<StoredReadingPosition>(initialStoredReadingPosition);
-
-  const activeHeadingSlugRef = useRef<ActiveHeadingSlug>(null);
-
-  const currentScrollOffsetYRef = useRef(0);
-
-  const hasMeasuredContentRef = useRef(false);
-
-  const [restorePhase, setRestorePhaseState] = useState<RestorePhase>(initialRestorePhase);
-
-  const [storedReadingPosition, setStoredReadingPosition] = useState<StoredReadingPosition>(
-    initialStoredReadingPosition,
-  );
-
-  const [activeHeadingSlug, setActiveHeadingSlug] = useState<ActiveHeadingSlug>(null);
+  const {
+    blockOffsetsRef,
+    restorePhaseRef,
+    storedReadingPositionRef,
+    activeHeadingSlugRef,
+    currentScrollOffsetYRef,
+    hasMeasuredContentRef,
+  } = refs;
 
   const setRestorePhase = useCallback((phase: RestorePhase) => {
     if (restorePhaseRef.current === phase) {
@@ -128,10 +126,7 @@ export function useReaderPosition({
 
   const setStoredReadingPositionValue = useCallback((position: StoredReadingPosition) => {
     const currentPosition = storedReadingPositionRef.current;
-    if (
-      currentPosition.anchorSlug === position.anchorSlug &&
-      currentPosition.scrollOffsetY === position.scrollOffsetY
-    ) {
+    if (isReadingPositionUnchanged(currentPosition, position)) {
       return;
     }
 
@@ -148,40 +143,26 @@ export function useReaderPosition({
   }, []);
 
   useLayoutEffect(() => {
-    if (tocHeadings.length === 0) {
-      setResolvedActiveHeadingSlug(null);
-      return;
-    }
-
-    const currentHeadingSlug = activeHeadingSlugRef.current;
-    if (currentHeadingSlug && tocHeadings.some((heading) => heading.slug === currentHeadingSlug)) {
-      return;
-    }
-
-    const storedAnchorSlug = storedReadingPositionRef.current.anchorSlug;
-
-    const nextHeadingSlug =
-      storedAnchorSlug && tocHeadings.some((heading) => heading.slug === storedAnchorSlug)
-        ? storedAnchorSlug
-        : tocHeadings[0].slug;
-    setResolvedActiveHeadingSlug(nextHeadingSlug);
-  }, [setResolvedActiveHeadingSlug, tocHeadings]);
+    syncActiveHeadingForTableOfContents(
+      activeHeadingSlugRef,
+      storedReadingPositionRef,
+      tocHeadings,
+      setResolvedActiveHeadingSlug,
+    );
+  }, [tocHeadings, setResolvedActiveHeadingSlug]);
 
   useEffect(() => {
     blockOffsetsRef.current = {};
   }, [htmlBlocks]);
 
   useLayoutEffect(() => {
-    blockOffsetsRef.current = {};
-    hasMeasuredContentRef.current = false;
-    setResolvedActiveHeadingSlug(null);
-    currentScrollOffsetYRef.current = 0;
-    const { storedReadingPosition: nextStoredReadingPosition, restorePhase: nextRestorePhase } =
-      resolveRestoreState(articleId);
-    setStoredReadingPositionValue(nextStoredReadingPosition);
-    activeHeadingSlugRef.current = nextStoredReadingPosition.anchorSlug;
-    currentScrollOffsetYRef.current = nextStoredReadingPosition.scrollOffsetY ?? 0;
-    setRestorePhase(nextRestorePhase);
+    resetReaderPositionState({
+      articleId,
+      refs,
+      setResolvedActiveHeadingSlug,
+      setStoredReadingPositionValue,
+      setRestorePhase,
+    });
   }, [articleId, setResolvedActiveHeadingSlug, setRestorePhase, setStoredReadingPositionValue]);
 
   const persistReadingPosition = useCallback(() => {
@@ -191,74 +172,35 @@ export function useReaderPosition({
 
     const roundedScrollOffsetY = Math.max(0, Math.round(currentScrollOffsetYRef.current));
     if (roundedScrollOffsetY < MIN_SCROLL_OFFSET_TO_PERSIST_READING_POSITION) {
-      saveLibraryItemReadingPosition(articleId, {
+      saveArticleReadingPosition(articleId, {
         anchorSlug: null,
         scrollOffsetY: null,
       });
       return;
     }
 
-    saveLibraryItemReadingPosition(articleId, {
+    saveArticleReadingPosition(articleId, {
       anchorSlug: activeHeadingSlugRef.current,
       scrollOffsetY: roundedScrollOffsetY,
     });
   }, [articleId]);
 
   const restoreStoredReadingPositionIfReady = useCallback(() => {
-    if (isLoading || restorePhaseRef.current === "ready") {
-      return;
-    }
-
-    const { anchorSlug: storedAnchorSlug, scrollOffsetY: storedScrollOffsetY } =
-      storedReadingPositionRef.current;
-
-    if (storedScrollOffsetY !== null) {
-      if (storedScrollOffsetY > 0 && !hasMeasuredContentRef.current) {
-        return;
-      }
-
-      scrollToArticleOffset(storedScrollOffsetY, false);
-      const activeHeading = resolveHeadingForScrollOffset(
-        storedScrollOffsetY,
-        tocHeadings,
-        blockOffsetsRef.current,
-      );
-      setResolvedActiveHeadingSlug(activeHeading?.slug ?? null);
-      setRestorePhase("ready");
-      return;
-    }
-
-    if (!storedAnchorSlug || tocHeadings.length === 0) {
-      setRestorePhase("ready");
-      return;
-    }
-
-    const storedHeading = tocHeadings.find((heading) => heading.slug === storedAnchorSlug);
-    if (!storedHeading) {
-      setRestorePhase("ready");
-      return;
-    }
-
-    if (storedHeading.blockIndex === TITLE_TOC_BLOCK_INDEX) {
-      scrollToArticleOffset(0, false);
-      setResolvedActiveHeadingSlug(storedHeading.slug);
-      setRestorePhase("ready");
-      return;
-    }
-
-    const blockOffset = blockOffsetsRef.current[storedHeading.blockIndex];
-    if (typeof blockOffset !== "number") {
-      return;
-    }
-    scrollToArticleOffset(resolveAnchorScrollOffset(blockOffset), false);
-    setResolvedActiveHeadingSlug(storedHeading.slug);
-    setRestorePhase("ready");
+    restoreStoredReadingPosition({
+      isLoading,
+      tocHeadings,
+      refs,
+      scrollToArticleOffset,
+      setResolvedActiveHeadingSlug,
+      setRestorePhase,
+    });
   }, [
     isLoading,
+    tocHeadings,
+    refs,
     scrollToArticleOffset,
     setResolvedActiveHeadingSlug,
     setRestorePhase,
-    tocHeadings,
   ]);
 
   useLayoutEffect(() => {
@@ -304,10 +246,10 @@ export function useReaderPosition({
       const scrollOffsetY = Math.max(0, event.nativeEvent.contentOffset.y);
       currentScrollOffsetYRef.current = scrollOffsetY;
 
-      const hasStoredRestoreTarget =
-        storedReadingPositionRef.current.scrollOffsetY !== null ||
-        Boolean(storedReadingPositionRef.current.anchorSlug);
-      if (restorePhaseRef.current === "pending" && hasStoredRestoreTarget) {
+      if (
+        restorePhaseRef.current === "pending" &&
+        hasStoredRestoreTarget(storedReadingPositionRef.current)
+      ) {
         return;
       }
 
@@ -332,24 +274,13 @@ export function useReaderPosition({
     restoreStoredReadingPositionIfReady();
   }, [isLoading, restoreStoredReadingPositionIfReady]);
 
-  const isReadingPositionRestoreReady = restorePhase === "ready";
-
-  const { anchorSlug: storedAnchorSlug, scrollOffsetY: storedScrollOffsetY } =
-    storedReadingPosition;
-
-  const isRestoringFromAnchorOnly = storedScrollOffsetY === null;
-
-  const isRestoringToFirstHeadingAnchor =
-    Boolean(storedAnchorSlug && tocHeadings[0] && tocHeadings[0].slug === storedAnchorSlug) &&
-    isRestoringFromAnchorOnly;
-
-  const isRestoringToTopPosition =
-    (storedScrollOffsetY !== null && storedScrollOffsetY <= 0) || isRestoringToFirstHeadingAnchor;
-
-  const isRestoringReadingPosition =
-    !isLoading && !isReadingPositionRestoreReady && !isRestoringToTopPosition;
-
-  const shouldSuppressListHeader = !isReadingPositionRestoreReady && !isRestoringToTopPosition;
+  const { isReadingPositionRestoreReady, isRestoringReadingPosition, shouldSuppressListHeader } =
+    resolveReaderRestoreUiState({
+      isLoading,
+      restorePhase,
+      storedReadingPosition,
+      tocHeadings,
+    });
 
   return {
     articleScrollRef,
@@ -362,5 +293,236 @@ export function useReaderPosition({
     handleArticleScroll,
     handleContentSizeChange,
     persistReadingPosition,
+  };
+}
+
+function getStoredReadingPosition(articleId: LibraryItemId | undefined): StoredReadingPosition {
+  if (!articleId) {
+    return {
+      anchorSlug: null,
+      scrollOffsetY: null,
+    };
+  }
+
+  const { anchorSlug, scrollOffsetY } = readArticleReadingPosition(articleId);
+  return {
+    anchorSlug,
+    scrollOffsetY,
+  };
+}
+
+function hasStoredRestoreTarget(position: StoredReadingPosition): boolean {
+  return position.scrollOffsetY !== null || Boolean(position.anchorSlug);
+}
+
+function isReadingPositionUnchanged(
+  currentPosition: StoredReadingPosition,
+  nextPosition: StoredReadingPosition,
+): boolean {
+  return (
+    currentPosition.anchorSlug === nextPosition.anchorSlug &&
+    currentPosition.scrollOffsetY === nextPosition.scrollOffsetY
+  );
+}
+
+function resetReaderPositionState(args: {
+  articleId: LibraryItemId | undefined;
+  refs: ReaderPositionRefs;
+  setResolvedActiveHeadingSlug: (headingSlug: ActiveHeadingSlug) => void;
+  setStoredReadingPositionValue: (position: StoredReadingPosition) => void;
+  setRestorePhase: (phase: RestorePhase) => void;
+}): void {
+  const {
+    articleId,
+    refs,
+    setResolvedActiveHeadingSlug,
+    setStoredReadingPositionValue,
+    setRestorePhase,
+  } = args;
+
+  refs.blockOffsetsRef.current = {};
+  refs.hasMeasuredContentRef.current = false;
+  setResolvedActiveHeadingSlug(null);
+  refs.currentScrollOffsetYRef.current = 0;
+
+  const { storedReadingPosition, restorePhase } = resolveRestoreState(articleId);
+  setStoredReadingPositionValue(storedReadingPosition);
+  refs.activeHeadingSlugRef.current = storedReadingPosition.anchorSlug;
+  refs.currentScrollOffsetYRef.current = storedReadingPosition.scrollOffsetY ?? 0;
+  setRestorePhase(restorePhase);
+}
+
+function resolveReaderRestoreUiState(args: {
+  isLoading: boolean;
+  restorePhase: RestorePhase;
+  storedReadingPosition: StoredReadingPosition;
+  tocHeadings: ReaderHeading[];
+}): ReaderRestoreUiState {
+  const { isLoading, restorePhase, storedReadingPosition, tocHeadings } = args;
+  const isReadingPositionRestoreReady = restorePhase === "ready";
+  const isRestoringToTopPosition = resolveTopRestoreState(storedReadingPosition, tocHeadings);
+
+  return {
+    isReadingPositionRestoreReady,
+    isRestoringReadingPosition:
+      !isLoading && !isReadingPositionRestoreReady && !isRestoringToTopPosition,
+    shouldSuppressListHeader: !isReadingPositionRestoreReady && !isRestoringToTopPosition,
+  };
+}
+
+function resolveRestorePhase(position: StoredReadingPosition): RestorePhase {
+  return position.anchorSlug === null && position.scrollOffsetY === null ? "ready" : "pending";
+}
+
+function resolveRestoreState(articleId: LibraryItemId | undefined): RestoreState {
+  const storedReadingPosition = getStoredReadingPosition(articleId);
+  return {
+    storedReadingPosition,
+    restorePhase: resolveRestorePhase(storedReadingPosition),
+  };
+}
+
+function resolveTopRestoreState(
+  position: StoredReadingPosition,
+  tocHeadings: ReaderHeading[],
+): boolean {
+  if (position.scrollOffsetY !== null) {
+    return position.scrollOffsetY <= 0;
+  }
+
+  return Boolean(
+    position.anchorSlug && tocHeadings[0] && tocHeadings[0].slug === position.anchorSlug,
+  );
+}
+
+function restoreStoredReadingPosition(args: {
+  isLoading: boolean;
+  tocHeadings: ReaderHeading[];
+  refs: ReaderPositionRefs;
+  scrollToArticleOffset: (offsetY: number, animated: boolean) => void;
+  setResolvedActiveHeadingSlug: (headingSlug: ActiveHeadingSlug) => void;
+  setRestorePhase: (phase: RestorePhase) => void;
+}): void {
+  const {
+    isLoading,
+    tocHeadings,
+    refs,
+    scrollToArticleOffset,
+    setResolvedActiveHeadingSlug,
+    setRestorePhase,
+  } = args;
+
+  if (isLoading || refs.restorePhaseRef.current === "ready") {
+    return;
+  }
+
+  const { anchorSlug: storedAnchorSlug, scrollOffsetY: storedScrollOffsetY } =
+    refs.storedReadingPositionRef.current;
+
+  if (storedScrollOffsetY !== null) {
+    if (storedScrollOffsetY > 0 && !refs.hasMeasuredContentRef.current) {
+      return;
+    }
+
+    scrollToArticleOffset(storedScrollOffsetY, false);
+    const activeHeading = resolveHeadingForScrollOffset(
+      storedScrollOffsetY,
+      tocHeadings,
+      refs.blockOffsetsRef.current,
+    );
+    setResolvedActiveHeadingSlug(activeHeading?.slug ?? null);
+    setRestorePhase("ready");
+    return;
+  }
+
+  if (!storedAnchorSlug || tocHeadings.length === 0) {
+    setRestorePhase("ready");
+    return;
+  }
+
+  const storedHeading = tocHeadings.find((heading) => heading.slug === storedAnchorSlug);
+  if (!storedHeading) {
+    setRestorePhase("ready");
+    return;
+  }
+
+  if (storedHeading.blockIndex === TITLE_TOC_BLOCK_INDEX) {
+    scrollToArticleOffset(0, false);
+    setResolvedActiveHeadingSlug(storedHeading.slug);
+    setRestorePhase("ready");
+    return;
+  }
+
+  const blockOffset = refs.blockOffsetsRef.current[storedHeading.blockIndex];
+  if (typeof blockOffset !== "number") {
+    return;
+  }
+
+  scrollToArticleOffset(resolveAnchorScrollOffset(blockOffset), false);
+  setResolvedActiveHeadingSlug(storedHeading.slug);
+  setRestorePhase("ready");
+}
+
+function syncActiveHeadingForTableOfContents(
+  activeHeadingSlugRef: ReaderPositionRefs["activeHeadingSlugRef"],
+  storedReadingPositionRef: ReaderPositionRefs["storedReadingPositionRef"],
+  tocHeadings: ReaderHeading[],
+  setResolvedActiveHeadingSlug: (headingSlug: ActiveHeadingSlug) => void,
+): void {
+  if (tocHeadings.length === 0) {
+    setResolvedActiveHeadingSlug(null);
+    return;
+  }
+
+  const currentHeadingSlug = activeHeadingSlugRef.current;
+  if (currentHeadingSlug && tocHeadings.some((heading) => heading.slug === currentHeadingSlug)) {
+    return;
+  }
+
+  const storedAnchorSlug = storedReadingPositionRef.current.anchorSlug;
+
+  const nextHeadingSlug =
+    storedAnchorSlug && tocHeadings.some((heading) => heading.slug === storedAnchorSlug)
+      ? storedAnchorSlug
+      : tocHeadings[0].slug;
+  setResolvedActiveHeadingSlug(nextHeadingSlug);
+}
+
+function useReaderPositionState(
+  initialRestorePhase: RestorePhase,
+  initialStoredReadingPosition: StoredReadingPosition,
+): ReaderPositionState {
+  const blockOffsetsRef = useRef<Record<number, number>>({});
+  const restorePhaseRef = useRef<RestorePhase>(initialRestorePhase);
+  const storedReadingPositionRef = useRef<StoredReadingPosition>(initialStoredReadingPosition);
+  const activeHeadingSlugRef = useRef<ActiveHeadingSlug>(null);
+  const currentScrollOffsetYRef = useRef(0);
+  const hasMeasuredContentRef = useRef(false);
+
+  const refs = useRef<ReaderPositionRefs>({
+    blockOffsetsRef,
+    restorePhaseRef,
+    storedReadingPositionRef,
+    activeHeadingSlugRef,
+    currentScrollOffsetYRef,
+    hasMeasuredContentRef,
+  }).current;
+
+  const [restorePhase, setRestorePhaseState] = useState<RestorePhase>(initialRestorePhase);
+
+  const [storedReadingPosition, setStoredReadingPosition] = useState<StoredReadingPosition>(
+    initialStoredReadingPosition,
+  );
+
+  const [activeHeadingSlug, setActiveHeadingSlug] = useState<ActiveHeadingSlug>(null);
+
+  return {
+    refs,
+    restorePhase,
+    setRestorePhaseState,
+    storedReadingPosition,
+    setStoredReadingPosition,
+    activeHeadingSlug,
+    setActiveHeadingSlug,
   };
 }

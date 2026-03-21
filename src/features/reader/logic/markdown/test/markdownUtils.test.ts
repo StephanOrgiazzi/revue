@@ -4,7 +4,7 @@ import {
   normalizeMathExpression,
   normalizeComparableText,
   normalizeHeadingLevel,
-} from ".././markdownUtils";
+} from "@/features/reader/logic/markdown/markdownUtils";
 
 describe("markdownUtils", () => {
   describe("escapeHtml", () => {

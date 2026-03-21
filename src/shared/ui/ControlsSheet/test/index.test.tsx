@@ -1,8 +1,8 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 
-import { ControlsSheet } from "@/shared/ui/ControlsSheet";
 import { THEME_OPTIONS } from "@/shared/themes/themes";
+import { ControlsSheet } from "@/shared/ui/ControlsSheet";
 
 const mockStartClose = jest.fn((action?: () => void) => action?.());
 

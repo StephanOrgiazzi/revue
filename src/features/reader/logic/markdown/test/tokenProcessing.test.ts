@@ -1,10 +1,11 @@
 import type { Token } from "marked";
+
+import { READER_H3_AFTER_H2_CLASS_NAME } from "@/features/reader/logic/markdown/constants";
 import {
   isHeadingBlockToken,
   removeTitleDuplicateHeading,
   annotateHeadingTokensWithRenderClasses,
-} from ".././tokenProcessing";
-import { READER_H3_AFTER_H2_CLASS_NAME } from ".././constants";
+} from "@/features/reader/logic/markdown/tokenProcessing";
 
 describe("tokenProcessing", () => {
   describe("isHeadingBlockToken", () => {

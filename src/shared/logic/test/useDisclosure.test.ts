@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native";
-import { useDisclosure } from ".././useDisclosure";
+
+import { useDisclosure } from "@/shared/logic/useDisclosure";
 
 describe("useDisclosure", () => {
   it("should initialize with default value (false)", () => {

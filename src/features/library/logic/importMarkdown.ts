@@ -3,25 +3,17 @@ import { Directory, File, Paths } from "expo-file-system";
 import { copyAsync as copyFileAsyncLegacy } from "expo-file-system/legacy";
 import { Platform } from "react-native";
 
+import type { PickedMarkdownAsset } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
+
 import { copyLocalMarkdownAssets } from "@/features/library/logic/importMarkdown/copyLocalMarkdownAssets";
 import {
   assertMarkdownFileName,
   extractFileNameFromUri,
   normalizeLocalUri,
 } from "@/features/library/logic/importMarkdown/uriUtils";
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
 import { parseMarkdownDocument } from "@/shared/logic/markdown";
 import { readTextFromWebUri } from "@/shared/logic/web/textUri";
-
-export type PickedMarkdownAsset = {
-  name: string;
-  uri: string;
-};
-
-type ImportedMarkdown = {
-  rawMarkdown: string;
-  localPath: string;
-};
 
 type FinalizeMarkdownImportOptions = {
   id: LibraryItemId;
@@ -32,8 +24,71 @@ type FinalizeMarkdownImportOptions = {
   };
 };
 
-function normalizeTags(tags: string[] | undefined): string[] {
-  return tags?.map((tag) => tag.trim()).filter(Boolean) ?? [];
+type ImportedMarkdown = {
+  rawMarkdown: string;
+  localPath: string;
+};
+
+export function createPickedMarkdownAssetFromUri(uri: string): PickedMarkdownAsset | null {
+  const trimmedUri = normalizeLocalUri(uri);
+  if (!trimmedUri) {
+    return null;
+  }
+
+  const fileName = extractFileNameFromUri(trimmedUri);
+  assertMarkdownFileName(fileName);
+
+  return {
+    name: fileName,
+    uri: trimmedUri,
+  };
+}
+
+export async function finalizeMarkdownImport(
+  pickedAsset: PickedMarkdownAsset,
+  options: FinalizeMarkdownImportOptions,
+): Promise<LibraryItem> {
+  assertMarkdownFileName(pickedAsset.name);
+
+  const { rawMarkdown, localPath } = await readAndPersistImportedMarkdown(pickedAsset, options.id);
+
+  const parsedMarkdown = parseMarkdownDocument(rawMarkdown);
+
+  const title = extractTitle(parsedMarkdown.content, pickedAsset.name, parsedMarkdown.data.title);
+
+  return createLibraryItem({
+    id: options.id,
+    title,
+    localPath,
+    createdAt: options.createdAt,
+    tags: parsedMarkdown.data.tags,
+    readingPosition: options.readingPosition,
+  });
+}
+
+export async function pickMarkdownDocument(): Promise<PickedMarkdownAsset | null> {
+  const result = await DocumentPicker.getDocumentAsync({
+    multiple: false,
+    type: ["text/markdown", "text/plain"],
+    copyToCacheDirectory: false,
+  });
+
+  if (result.canceled) {
+    return null;
+  }
+
+  const pickedAsset = result.assets[0];
+  if (!pickedAsset?.uri) {
+    return null;
+  }
+
+  const fileName = pickedAsset.name || "untitled.md";
+  assertMarkdownFileName(fileName);
+
+  return {
+    name: fileName,
+    uri: normalizeLocalUri(pickedAsset.uri),
+  };
 }
 
 function createLibraryItem(input: {
@@ -80,44 +135,8 @@ function extractTitle(
   return fallbackFileName.replace(/\.md$/i, "");
 }
 
-export async function pickMarkdownDocument(): Promise<PickedMarkdownAsset | null> {
-  const result = await DocumentPicker.getDocumentAsync({
-    multiple: false,
-    type: ["text/markdown", "text/plain"],
-    copyToCacheDirectory: false,
-  });
-
-  if (result.canceled) {
-    return null;
-  }
-
-  const pickedAsset = result.assets[0];
-  if (!pickedAsset?.uri) {
-    return null;
-  }
-
-  const fileName = pickedAsset.name || "untitled.md";
-  assertMarkdownFileName(fileName);
-
-  return {
-    name: fileName,
-    uri: normalizeLocalUri(pickedAsset.uri),
-  };
-}
-
-export function createPickedMarkdownAssetFromUri(uri: string): PickedMarkdownAsset | null {
-  const trimmedUri = normalizeLocalUri(uri);
-  if (!trimmedUri) {
-    return null;
-  }
-
-  const fileName = extractFileNameFromUri(trimmedUri);
-  assertMarkdownFileName(fileName);
-
-  return {
-    name: fileName,
-    uri: trimmedUri,
-  };
+function normalizeTags(tags: string[] | undefined): string[] {
+  return tags?.map((tag) => tag.trim()).filter(Boolean) ?? [];
 }
 
 async function readAndPersistImportedMarkdown(
@@ -162,26 +181,4 @@ async function readAndPersistImportedMarkdown(
     rawMarkdown: rewrittenMarkdown,
     localPath: destinationFile.uri,
   };
-}
-
-export async function finalizeMarkdownImport(
-  pickedAsset: PickedMarkdownAsset,
-  options: FinalizeMarkdownImportOptions,
-): Promise<LibraryItem> {
-  assertMarkdownFileName(pickedAsset.name);
-
-  const { rawMarkdown, localPath } = await readAndPersistImportedMarkdown(pickedAsset, options.id);
-
-  const parsedMarkdown = parseMarkdownDocument(rawMarkdown);
-
-  const title = extractTitle(parsedMarkdown.content, pickedAsset.name, parsedMarkdown.data.title);
-
-  return createLibraryItem({
-    id: options.id,
-    title,
-    localPath,
-    createdAt: options.createdAt,
-    tags: parsedMarkdown.data.tags,
-    readingPosition: options.readingPosition,
-  });
 }

@@ -1,8 +1,9 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
+
+import type { LibraryItem } from "@/shared/library/types";
 
 import { LibraryGrid } from "@/features/library/components/LibraryGrid";
-import type { LibraryItem } from "@/features/library/logic/types";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 
 const mockTriggerContextClickHaptic = jest.fn();

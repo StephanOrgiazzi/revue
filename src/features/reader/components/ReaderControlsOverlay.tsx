@@ -1,9 +1,9 @@
+import type { MarkdownTextSizeLevel, Theme, ThemeId, ThemeOption } from "@/shared/themes/types";
+import type { TableOfContentsHeading } from "@/shared/ui/types";
+
+import { useDisclosure } from "@/shared/logic/useDisclosure";
 import { ControlsSheet } from "@/shared/ui/ControlsSheet";
 import { FloatingMenuButton } from "@/shared/ui/FloatingMenuButton";
-import { useDisclosure } from "@/shared/logic/useDisclosure";
-import type { MarkdownTextSizeLevel } from "@/shared/themes/markdownTextSize";
-import type { Theme, ThemeId, ThemeOption } from "@/shared/themes/themes";
-import type { TableOfContentsHeading } from "@/shared/ui/TableOfContentsSection";
 
 type ReaderControlsOverlayProps = {
   isFloatingMenuVisible: boolean;

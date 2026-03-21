@@ -1,9 +1,5 @@
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
-
-export type CardPalette = {
-  backgroundColor: string;
-  highlightColor: string;
-};
+import type { CardPalette } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
 
 const CARD_PALETTES: CardPalette[] = [
   { backgroundColor: "#DCE7FB", highlightColor: "#C8D6F4" },
@@ -19,25 +15,6 @@ const CARD_PALETTES: CardPalette[] = [
   { backgroundColor: "#F5E5EE", highlightColor: "#EED3E1" },
   { backgroundColor: "#EAF1D9", highlightColor: "#DDE8C3" },
 ];
-
-function hashString(value: string): number {
-  let hash = 0;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(index);
-    hash |= 0;
-  }
-
-  return Math.abs(hash);
-}
-
-export function sortLibraryItems(items: LibraryItem[]): LibraryItem[] {
-  return [...items].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-}
-
-export function cardPaletteForTitle(title: string): CardPalette {
-  return CARD_PALETTES[hashString(title) % CARD_PALETTES.length];
-}
 
 type BuildCardPalettesOptions = {
   columnCount?: number;
@@ -90,4 +67,23 @@ export function buildCardPalettesForGrid(
   });
 
   return paletteByItemId;
+}
+
+export function cardPaletteForTitle(title: string): CardPalette {
+  return CARD_PALETTES[hashString(title) % CARD_PALETTES.length];
+}
+
+export function sortLibraryItems(items: LibraryItem[]): LibraryItem[] {
+  return [...items].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+function hashString(value: string): number {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index);
+    hash |= 0;
+  }
+
+  return Math.abs(hash);
 }

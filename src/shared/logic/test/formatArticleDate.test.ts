@@ -1,4 +1,4 @@
-import { formatArticleDate } from ".././formatArticleDate";
+import { formatArticleDate } from "@/shared/logic/formatArticleDate";
 
 describe("formatArticleDate", () => {
   it("returns null for missing date values", () => {

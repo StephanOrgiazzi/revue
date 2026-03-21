@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native";
-import { useReaderFloatingMenuVisibility } from ".././useReaderFloatingMenuVisibility";
+
+import { useReaderFloatingMenuVisibility } from "@/features/reader/hooks/useReaderFloatingMenuVisibility";
 
 type VisibilityHookProps = {
   isEnabled: boolean;

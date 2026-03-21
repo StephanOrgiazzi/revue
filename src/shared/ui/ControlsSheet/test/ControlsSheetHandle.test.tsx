@@ -1,8 +1,8 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 
-import { ControlsSheetHandle } from "@/shared/ui/ControlsSheet/ControlsSheetHandle";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
+import { ControlsSheetHandle } from "@/shared/ui/ControlsSheet/ControlsSheetHandle";
 
 describe("ControlsSheetHandle", () => {
   it("shows exit card when enabled and handles press", () => {

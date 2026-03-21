@@ -1,5 +1,5 @@
-type RawArticleDate = string | undefined;
 type FormattedArticleDate = string | null;
+type RawArticleDate = string | undefined;
 
 export function formatArticleDate(rawDate: RawArticleDate): FormattedArticleDate {
   if (!rawDate) {

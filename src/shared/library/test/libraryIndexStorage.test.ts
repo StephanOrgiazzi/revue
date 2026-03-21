@@ -10,13 +10,11 @@ jest.mock("@/shared/logic/platformStorage", () => ({
 describe("libraryIndexStorage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset module to clear internal cache
     jest.resetModules();
   });
 
   it("should return empty object if storage is empty", () => {
-    // Re-import to get fresh module with reset cache
-    const { getLibraryIndex } = require(".././libraryIndexStorage");
+    const { getLibraryIndex } = require("@/shared/library/libraryIndexStorage");
     mockStorage.read.mockReturnValue(undefined);
 
     expect(getLibraryIndex()).toEqual({});
@@ -24,19 +22,18 @@ describe("libraryIndexStorage", () => {
   });
 
   it("should parse and return library index from storage", () => {
-    const { getLibraryIndex } = require(".././libraryIndexStorage");
-
+    const { getLibraryIndex } = require("@/shared/library/libraryIndexStorage");
     const index = { id1: { id: "id1", title: "Title", tags: ["t1"] } };
+
     mockStorage.read.mockReturnValue(JSON.stringify(index));
 
     const result = getLibraryIndex();
     expect(result).toEqual(index);
-    expect(result).not.toBe(index); // Should be cloned
+    expect(result).not.toBe(index);
   });
 
   it("should save library index to storage", () => {
-    const { saveLibraryIndex } = require(".././libraryIndexStorage");
-
+    const { saveLibraryIndex } = require("@/shared/library/libraryIndexStorage");
     const index = { id2: { id: "id2", title: "Save me", tags: [] } };
 
     saveLibraryIndex(index);
@@ -45,7 +42,7 @@ describe("libraryIndexStorage", () => {
   });
 
   it("should handle JSON parse errors", () => {
-    const { getLibraryIndex } = require(".././libraryIndexStorage");
+    const { getLibraryIndex } = require("@/shared/library/libraryIndexStorage");
     mockStorage.read.mockReturnValue("invalid json");
 
     expect(getLibraryIndex()).toEqual({});

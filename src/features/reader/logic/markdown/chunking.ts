@@ -1,11 +1,12 @@
 import type { Token } from "marked";
 
+import type { ReaderHeading } from "@/features/reader/logic/markdown/types";
+
 import {
   normalizeComparableText,
   normalizeHeadingLevel,
 } from "@/features/reader/logic/markdown/markdownUtils";
 import { isHeadingBlockToken } from "@/features/reader/logic/markdown/tokenProcessing";
-import type { ReaderHeading } from "@/features/reader/logic/markdown/types";
 
 type HtmlBlocksAndHeadingsResult = {
   htmlBlocks: string[];
@@ -13,18 +14,6 @@ type HtmlBlocksAndHeadingsResult = {
 };
 
 type RenderTokensToHtml = (tokens: Token[]) => string;
-
-function buildUniqueHeadingSlug(rawHeadingText: string, slugCounters: Map<string, number>): string {
-  const slugBase =
-    `heading-${normalizeComparableText(rawHeadingText).replace(/\s+/g, "-")}`.replace(/-+$/g, "");
-
-  const previousCounter = slugCounters.get(slugBase) ?? 0;
-
-  const nextCounter = previousCounter + 1;
-  slugCounters.set(slugBase, nextCounter);
-
-  return nextCounter === 1 ? slugBase : `${slugBase}-${nextCounter}`;
-}
 
 export function buildHtmlBlocksAndHeadings(
   tokens: Token[],
@@ -97,4 +86,16 @@ export function buildHtmlBlocksAndHeadings(
   flushChunk();
 
   return { htmlBlocks, headings };
+}
+
+function buildUniqueHeadingSlug(rawHeadingText: string, slugCounters: Map<string, number>): string {
+  const slugBase =
+    `heading-${normalizeComparableText(rawHeadingText).replace(/\s+/g, "-")}`.replace(/-+$/g, "");
+
+  const previousCounter = slugCounters.get(slugBase) ?? 0;
+
+  const nextCounter = previousCounter + 1;
+  slugCounters.set(slugBase, nextCounter);
+
+  return nextCounter === 1 ? slugBase : `${slugBase}-${nextCounter}`;
 }

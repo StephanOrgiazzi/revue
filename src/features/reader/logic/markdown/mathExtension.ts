@@ -1,5 +1,7 @@
 import type { MarkedExtension, Token } from "marked";
 
+import type { ReaderMathToken } from "@/features/reader/logic/markdown/types";
+
 import {
   READER_MATH_BLOCK_CLASS_NAME,
   READER_MATH_BLOCK_CONTENT_CLASS_NAME,
@@ -11,7 +13,6 @@ import {
   escapeHtml,
   normalizeMathExpression,
 } from "@/features/reader/logic/markdown/markdownUtils";
-import type { ReaderMathToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MATH_EM_STRONG_MASK_REGEX =
   /(?:\$\$[\s\S]+?\$\$)|(?:\\\[[\s\S]+?\\\])|(?:\\\([\s\S]+?\\\))|(?:\$[^\n$]+?\$)/g;
@@ -35,16 +36,20 @@ type InlineDollarMathExpressionMatch = {
 
 type ReaderMathTokenType = ReaderMathToken["type"];
 
-function isEscapedCharacter(source: string, index: number): boolean {
-  let slashCount = 0;
-  for (
-    let characterIndex = index - 1;
-    characterIndex >= 0 && source[characterIndex] === "\\";
-    characterIndex -= 1
-  ) {
-    slashCount += 1;
+function buildMathToken(
+  type: ReaderMathTokenType,
+  raw: string,
+  expression: string,
+): ReaderMathToken | undefined {
+  if (!expression) {
+    return;
   }
-  return slashCount % 2 === 1;
+
+  return {
+    type,
+    raw,
+    expression,
+  };
 }
 
 function extractInlineDollarMathExpression(src: string): InlineDollarMathExpressionMatch | null {
@@ -82,20 +87,16 @@ function extractInlineDollarMathExpression(src: string): InlineDollarMathExpress
   return null;
 }
 
-function buildMathToken(
-  type: ReaderMathTokenType,
-  raw: string,
-  expression: string,
-): ReaderMathToken | undefined {
-  if (!expression) {
-    return;
+function isEscapedCharacter(source: string, index: number): boolean {
+  let slashCount = 0;
+  for (
+    let characterIndex = index - 1;
+    characterIndex >= 0 && source[characterIndex] === "\\";
+    characterIndex -= 1
+  ) {
+    slashCount += 1;
   }
-
-  return {
-    type,
-    raw,
-    expression,
-  };
+  return slashCount % 2 === 1;
 }
 
 function isReaderMathToken(token: Token): token is ReaderMathToken {

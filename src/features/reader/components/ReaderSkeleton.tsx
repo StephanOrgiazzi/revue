@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import type { Theme } from "@/shared/themes/themes";
+import type { Theme } from "@/shared/themes/types";
 
 type ReaderSkeletonProps = {
   theme: Theme;
@@ -28,14 +28,6 @@ type SkeletonBarProps = {
   radius?: number;
   animationStyle: ReturnType<typeof useAnimatedStyle>;
 };
-
-function SkeletonBar({ width, height, radius = 10, animationStyle }: SkeletonBarProps) {
-  return (
-    <Animated.View
-      style={[animationStyle, { width, height, borderRadius: radius, maxWidth: "100%" }]}
-    />
-  );
-}
 
 export function ReaderSkeleton({
   theme,
@@ -132,5 +124,13 @@ export function ReaderSkeleton({
         ))}
       </View>
     </View>
+  );
+}
+
+function SkeletonBar({ width, height, radius = 10, animationStyle }: SkeletonBarProps) {
+  return (
+    <Animated.View
+      style={[animationStyle, { width, height, borderRadius: radius, maxWidth: "100%" }]}
+    />
   );
 }

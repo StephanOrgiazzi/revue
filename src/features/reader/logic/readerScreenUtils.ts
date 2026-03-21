@@ -8,6 +8,14 @@ export const MAX_HTML_CONTENT_WIDTH = 760;
 
 type FormattedDate = string | null;
 
+export function buildArticleMeta(formattedDate: FormattedDate): string {
+  if (!formattedDate) {
+    return DEFAULT_ARTICLE_META_LABEL;
+  }
+
+  return formattedDate;
+}
+
 export function buildHtmlSystemFonts(): string[] {
   const expoSystemFonts = Array.isArray(Constants.systemFonts) ? Constants.systemFonts : [];
 
@@ -28,12 +36,4 @@ export function buildListMarkerRenderersProps(markerColor: string) {
 export function shouldShowHeaderFromHtmlBlocks(htmlBlocks: string[]): boolean {
   const firstBlock = htmlBlocks[0];
   return !firstBlock || !firstBlock.trimStart().startsWith("<h1");
-}
-
-export function buildArticleMeta(formattedDate: FormattedDate): string {
-  if (!formattedDate) {
-    return DEFAULT_ARTICLE_META_LABEL;
-  }
-
-  return formattedDate;
 }

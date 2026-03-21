@@ -3,75 +3,20 @@ type MarkdownFrontMatterExtraction = {
   content: string;
 };
 
-type ParsedMarkdownFrontMatter = {
-  title?: string;
-  tags?: string[];
-};
-
 type ParsedMarkdownDocument = {
   content: string;
   frontMatter: string | null;
   data: ParsedMarkdownFrontMatter;
 };
 
+type ParsedMarkdownFrontMatter = {
+  title?: string;
+  tags?: string[];
+};
+
 const YAML_KEY_VALUE_PATTERN = /^([A-Za-z0-9_-]+)\s*:\s*(.*)$/;
 
 const YAML_LIST_ITEM_PATTERN = /^-\s+(.+)$/;
-
-function removeUtf8Bom(value: string): string {
-  return value.startsWith("\uFEFF") ? value.slice(1) : value;
-}
-
-export function normalizeMarkdownLineEndings(value: string): string {
-  return value.replace(/\r\n/g, "\n");
-}
-
-function stripWrappingQuotes(value: string): string {
-  if (value.length < 2) {
-    return value;
-  }
-
-  const firstChar = value[0];
-
-  const lastChar = value[value.length - 1];
-  if ((firstChar === "'" && lastChar === "'") || (firstChar === '"' && lastChar === '"')) {
-    return value.slice(1, -1);
-  }
-
-  return value;
-}
-
-function parseInlineTags(value: string): string[] {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return [];
-  }
-
-  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-    return trimmed
-      .slice(1, -1)
-      .split(",")
-      .map((tag) => stripWrappingQuotes(tag.trim()))
-      .filter(Boolean);
-  }
-
-  return [stripWrappingQuotes(trimmed)];
-}
-
-function parseYamlLikeKeyValue(line: string): {
-  key: string;
-  rawValue: string;
-} | null {
-  const match = line.match(YAML_KEY_VALUE_PATTERN);
-  if (!match) {
-    return null;
-  }
-
-  return {
-    key: match[1],
-    rawValue: match[2].trim(),
-  };
-}
 
 export function extractMarkdownFrontMatter(markdown: string): MarkdownFrontMatterExtraction {
   const cleanedMarkdown = removeUtf8Bom(markdown);
@@ -110,6 +55,37 @@ export function extractMarkdownFrontMatter(markdown: string): MarkdownFrontMatte
     frontMatter: null,
     content: cleanedMarkdown,
   };
+}
+
+export function normalizeMarkdownLineEndings(value: string): string {
+  return value.replace(/\r\n/g, "\n");
+}
+
+export function parseMarkdownDocument(markdown: string): ParsedMarkdownDocument {
+  const extracted = extractMarkdownFrontMatter(markdown);
+
+  return {
+    content: extracted.content,
+    frontMatter: extracted.frontMatter,
+    data: parseMarkdownFrontMatter(extracted.frontMatter),
+  };
+}
+
+function parseInlineTags(value: string): string[] {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((tag) => stripWrappingQuotes(tag.trim()))
+      .filter(Boolean);
+  }
+
+  return [stripWrappingQuotes(trimmed)];
 }
 
 function parseMarkdownFrontMatter(
@@ -174,12 +150,36 @@ function parseMarkdownFrontMatter(
   return data;
 }
 
-export function parseMarkdownDocument(markdown: string): ParsedMarkdownDocument {
-  const extracted = extractMarkdownFrontMatter(markdown);
+function parseYamlLikeKeyValue(line: string): {
+  key: string;
+  rawValue: string;
+} | null {
+  const match = line.match(YAML_KEY_VALUE_PATTERN);
+  if (!match) {
+    return null;
+  }
 
   return {
-    content: extracted.content,
-    frontMatter: extracted.frontMatter,
-    data: parseMarkdownFrontMatter(extracted.frontMatter),
+    key: match[1],
+    rawValue: match[2].trim(),
   };
+}
+
+function removeUtf8Bom(value: string): string {
+  return value.startsWith("\uFEFF") ? value.slice(1) : value;
+}
+
+function stripWrappingQuotes(value: string): string {
+  if (value.length < 2) {
+    return value;
+  }
+
+  const firstChar = value[0];
+
+  const lastChar = value[value.length - 1];
+  if ((firstChar === "'" && lastChar === "'") || (firstChar === '"' && lastChar === '"')) {
+    return value.slice(1, -1);
+  }
+
+  return value;
 }

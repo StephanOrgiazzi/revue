@@ -1,10 +1,10 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 import * as ReactNative from "react-native";
 
-import { ThemeSelectionSection } from "@/shared/ui/ThemeSelectionSection";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 import { THEME_OPTIONS } from "@/shared/themes/themes";
+import { ThemeSelectionSection } from "@/shared/ui/ThemeSelectionSection";
 
 describe("ThemeSelectionSection", () => {
   afterEach(() => {

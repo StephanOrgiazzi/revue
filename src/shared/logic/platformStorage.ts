@@ -1,6 +1,8 @@
 import { Directory, File, Paths } from "expo-file-system";
 import { Platform } from "react-native";
 
+import type { ReportStorageError, StorageAdapter } from "@/shared/logic/types";
+
 import { createWebStorage } from "@/shared/logic/web/storage";
 
 const DEFAULT_STORAGE_DIRECTORY = "storage";
@@ -20,19 +22,6 @@ type CreatePlatformStorageInput = {
   directoryName?: string;
 };
 
-type StorageOperation = "read" | "write";
-
-export type StorageAdapter = {
-  read: () => string | undefined;
-  write: (value: string) => void;
-};
-
-export type ReportStorageError = (
-  operation: StorageOperation,
-  storagePath: string,
-  error: unknown,
-) => void;
-
 const reportStorageError: ReportStorageError = (operation, storagePath, error) => {
   if (!__DEV__) {
     return;
@@ -40,6 +29,18 @@ const reportStorageError: ReportStorageError = (operation, storagePath, error) =
 
   console.warn(`[platformStorage] Failed to ${operation} ${storagePath}`, error);
 };
+
+export function createPlatformStorage({
+  key,
+  fileName = `${key}.json`,
+  directoryName = DEFAULT_STORAGE_DIRECTORY,
+}: CreatePlatformStorageInput): StorageAdapter {
+  if (Platform.OS === "web") {
+    return createWebStorage(`${directoryName}/${fileName}`, reportStorageError);
+  }
+
+  return createNativeStorage(directoryName, fileName);
+}
 
 function createNativeStorage(directoryName: string, fileName: string): StorageAdapter {
   const storageDirectory = new Directory(Paths.document, directoryName);
@@ -107,16 +108,4 @@ function createNativeStorage(directoryName: string, fileName: string): StorageAd
       }
     },
   };
-}
-
-export function createPlatformStorage({
-  key,
-  fileName = `${key}.json`,
-  directoryName = DEFAULT_STORAGE_DIRECTORY,
-}: CreatePlatformStorageInput): StorageAdapter {
-  if (Platform.OS === "web") {
-    return createWebStorage(`${directoryName}/${fileName}`, reportStorageError);
-  }
-
-  return createNativeStorage(directoryName, fileName);
 }

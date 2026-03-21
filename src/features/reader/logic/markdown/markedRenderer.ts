@@ -1,5 +1,7 @@
-import { Marked, Renderer, type MarkedOptions, type Token } from "marked";
 import hljs from "highlight.js/lib/common";
+import { Marked, Renderer, type MarkedOptions, type Token } from "marked";
+
+import type { ReaderHeadingRenderToken } from "@/features/reader/logic/markdown/types";
 
 import {
   READER_BLOCKQUOTE_PARAGRAPH_CLASS_NAME,
@@ -14,7 +16,6 @@ import {
   normalizeHeadingLevel,
 } from "@/features/reader/logic/markdown/markdownUtils";
 import { READER_MATH_MARKED_EXTENSION } from "@/features/reader/logic/markdown/mathExtension";
-import type { ReaderHeadingRenderToken } from "@/features/reader/logic/markdown/types";
 
 const READER_MARKDOWN_RENDERER = new Renderer();
 
@@ -22,6 +23,25 @@ const ALLOWED_ABSOLUTE_IMAGE_PROTOCOLS = new Set(["http:", "https:", "file:"]);
 
 const SYNTHETIC_WEB_ORIGIN = "https://revue.local";
 let activeMarkdownSourceUri: string | undefined;
+
+function highlightCodeHtml(text: string, language: string): string {
+  if (!text.trim()) {
+    return escapeHtml(text);
+  }
+
+  try {
+    if (language && hljs.getLanguage(language)) {
+      return hljs.highlight(text, {
+        language,
+        ignoreIllegals: true,
+      }).value;
+    }
+
+    return hljs.highlightAuto(text).value;
+  } catch {
+    return escapeHtml(text);
+  }
+}
 
 function normalizeImageHref(href: string | null | undefined): string | null {
   if (!href) {
@@ -68,25 +88,6 @@ function normalizeImageHref(href: string | null | undefined): string | null {
     return resolvedUrl.toString();
   } catch {
     return null;
-  }
-}
-
-function highlightCodeHtml(text: string, language: string): string {
-  if (!text.trim()) {
-    return escapeHtml(text);
-  }
-
-  try {
-    if (language && hljs.getLanguage(language)) {
-      return hljs.highlight(text, {
-        language,
-        ignoreIllegals: true,
-      }).value;
-    }
-
-    return hljs.highlightAuto(text).value;
-  } catch {
-    return escapeHtml(text);
   }
 }
 

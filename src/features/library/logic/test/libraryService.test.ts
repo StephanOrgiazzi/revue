@@ -1,17 +1,24 @@
 import {
-  readInitialLibrarySnapshot,
+  finalizeMarkdownImport,
+  pickMarkdownDocument,
+} from "@/features/library/logic/importMarkdown";
+import {
+  deleteLibraryItem,
+  readLibraryItems,
+  saveLibraryItem,
+} from "@/features/library/logic/libraryRepository";
+import {
   appendPendingArticleId,
-  removePendingArticleId,
   appendLibraryItem,
-  importLibraryItemFromPicker,
   deleteLibraryItemWithOptimisticUpdate,
-} from ".././libraryService";
-import { readLibraryItems, saveLibraryItem, deleteLibraryItem } from ".././libraryRepository";
-import { pickMarkdownDocument, finalizeMarkdownImport } from ".././importMarkdown";
+  importLibraryItemFromPicker,
+  readInitialLibrarySnapshot,
+  removePendingArticleId,
+} from "@/features/library/logic/libraryService";
 
-jest.mock(".././libraryRepository");
-jest.mock(".././importMarkdown");
-jest.mock(".././libraryItemViewModel", () => ({
+jest.mock("@/features/library/logic/libraryRepository");
+jest.mock("@/features/library/logic/importMarkdown");
+jest.mock("@/features/library/logic/libraryItemViewModel", () => ({
   sortLibraryItems: jest.fn((items) => items),
 }));
 

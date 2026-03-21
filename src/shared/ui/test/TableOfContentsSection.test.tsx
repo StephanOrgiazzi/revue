@@ -1,12 +1,11 @@
+import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { FlatList } from "react-native";
-import { fireEvent, render } from "@testing-library/react-native";
 
-import {
-  TableOfContentsSection,
-  type TableOfContentsHeading,
-} from "@/shared/ui/TableOfContentsSection";
+import type { TableOfContentsHeading } from "@/shared/ui/types";
+
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
+import { TableOfContentsSection } from "@/shared/ui/TableOfContentsSection";
 
 const mockTriggerFrequentTickHaptic = jest.fn();
 
@@ -19,7 +18,6 @@ jest.mock("@/shared/logic/haptics", () => ({
 
 jest.mock("@gorhom/bottom-sheet", () => {
   const React = require("react");
-
   const { FlatList, Pressable, Text } = require("react-native");
 
   const BottomSheetFlatList = React.forwardRef(

@@ -1,5 +1,6 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
+
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Gesture } from "react-native-gesture-handler";
 import {
   Easing,

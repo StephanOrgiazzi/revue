@@ -1,8 +1,18 @@
-import { getSingleRouteParam, readArticleById, readArticleContent } from ".././readerRepository";
-import { readLibraryItemById } from "@/features/library/logic/libraryRepository";
+import {
+  getSingleRouteParam,
+  readArticleById,
+  readArticleContent,
+  readArticleReadingPosition,
+  saveArticleReadingPosition,
+} from "@/features/reader/logic/readerRepository";
+import {
+  readLibraryItemById,
+  readLibraryItemReadingPosition,
+  saveLibraryItemReadingPosition,
+} from "@/shared/library/libraryStore";
 import { canReadTextFromWebUri, readTextFromWebUri } from "@/shared/logic/web/textUri";
 
-jest.mock("@/features/library/logic/libraryRepository");
+jest.mock("@/shared/library/libraryStore");
 jest.mock("@/shared/logic/web/textUri");
 jest.mock("expo-file-system", () => ({
   File: jest.fn().mockImplementation(() => ({
@@ -69,6 +79,33 @@ describe("readerRepository", () => {
       await expect(readArticleContent("path", { signal: controller.signal })).rejects.toThrow(
         "The operation was aborted.",
       );
+    });
+  });
+
+  describe("article reading position", () => {
+    it("reads stored reading position from library persistence", () => {
+      (readLibraryItemReadingPosition as jest.Mock).mockReturnValue({
+        anchorSlug: "intro",
+        scrollOffsetY: 180,
+      });
+
+      expect(readArticleReadingPosition("1")).toEqual({
+        anchorSlug: "intro",
+        scrollOffsetY: 180,
+      });
+      expect(readLibraryItemReadingPosition).toHaveBeenCalledWith("1");
+    });
+
+    it("writes stored reading position through library persistence", () => {
+      saveArticleReadingPosition("1", {
+        anchorSlug: "section-2",
+        scrollOffsetY: 240,
+      });
+
+      expect(saveLibraryItemReadingPosition).toHaveBeenCalledWith("1", {
+        anchorSlug: "section-2",
+        scrollOffsetY: 240,
+      });
     });
   });
 });

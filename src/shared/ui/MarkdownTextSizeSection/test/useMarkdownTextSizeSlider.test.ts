@@ -4,26 +4,46 @@ import { Gesture } from "react-native-gesture-handler";
 import { useMarkdownTextSizeSlider } from "@/shared/ui/MarkdownTextSizeSection/useMarkdownTextSizeSlider";
 
 describe("useMarkdownTextSizeSlider", () => {
-  let capturedGestureCallbacks: any = {};
+  let capturedPanCallbacks: any = {};
+  let capturedTapCallbacks: any = {};
 
   beforeEach(() => {
-    capturedGestureCallbacks = {};
+    capturedPanCallbacks = {};
+    capturedTapCallbacks = {};
 
     const originalPan = Gesture.Pan;
+    const originalTap = Gesture.Tap;
+
     jest.spyOn(Gesture, "Pan").mockImplementation(() => {
       const pan = originalPan();
 
       const wrapCallback = (name: string, cb: any) => {
-        capturedGestureCallbacks[name] = cb;
+        capturedPanCallbacks[name] = cb;
         return pan;
       };
 
-      jest.spyOn(pan, "onBegin").mockImplementation((cb) => wrapCallback("onBegin", cb));
+      jest.spyOn(pan, "onStart").mockImplementation((cb) => wrapCallback("onStart", cb));
       jest.spyOn(pan, "onUpdate").mockImplementation((cb) => wrapCallback("onUpdate", cb));
       jest.spyOn(pan, "onEnd").mockImplementation((cb) => wrapCallback("onEnd", cb));
+      jest.spyOn(pan, "onFinalize").mockImplementation((cb) => wrapCallback("onFinalize", cb));
 
       return pan;
     });
+
+    jest.spyOn(Gesture, "Tap").mockImplementation(() => {
+      const tap = originalTap();
+
+      const wrapCallback = (name: string, cb: any) => {
+        capturedTapCallbacks[name] = cb;
+        return tap;
+      };
+
+      jest.spyOn(tap, "onEnd").mockImplementation((cb) => wrapCallback("onEnd", cb));
+
+      return tap;
+    });
+
+    jest.spyOn(Gesture, "Race").mockImplementation((...gestures) => gestures[0] as any);
   });
 
   afterEach(() => {
@@ -83,13 +103,13 @@ describe("useMarkdownTextSizeSlider", () => {
     });
 
     act(() => {
-      capturedGestureCallbacks.onBegin?.({ x: 20 } as any);
+      capturedPanCallbacks.onStart?.({ x: 20 } as any);
     });
 
     expect(onSelectMarkdownTextSizeLevel).not.toHaveBeenCalled();
 
     act(() => {
-      capturedGestureCallbacks.onEnd?.({ x: 80 } as any);
+      capturedPanCallbacks.onEnd?.({ x: 80 } as any, true);
     });
 
     expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(4);
@@ -112,12 +132,12 @@ describe("useMarkdownTextSizeSlider", () => {
     });
 
     act(() => {
-      capturedGestureCallbacks.onEnd?.({ x: 62 } as any);
+      capturedPanCallbacks.onEnd?.({ x: 62 } as any, true);
     });
     expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(3);
 
     act(() => {
-      capturedGestureCallbacks.onEnd?.({ x: 999 } as any);
+      capturedPanCallbacks.onEnd?.({ x: 999 } as any, true);
     });
     expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(5);
   });
@@ -139,11 +159,34 @@ describe("useMarkdownTextSizeSlider", () => {
     });
 
     act(() => {
-      capturedGestureCallbacks.onBegin?.({ x: Number.NaN } as any);
-      capturedGestureCallbacks.onUpdate?.({ x: Number.NaN } as any);
-      capturedGestureCallbacks.onEnd?.({ x: Number.NaN } as any);
+      capturedPanCallbacks.onStart?.({ x: Number.NaN } as any);
+      capturedPanCallbacks.onUpdate?.({ x: Number.NaN } as any);
+      capturedPanCallbacks.onEnd?.({ x: Number.NaN } as any, true);
     });
 
     expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(3);
+  });
+
+  it("selects a level when the user taps the track", () => {
+    const onSelectMarkdownTextSizeLevel = jest.fn();
+
+    const { result } = renderHook(() =>
+      useMarkdownTextSizeSlider({
+        activeMarkdownTextSizeLevel: 2,
+        onSelectMarkdownTextSizeLevel,
+      }),
+    );
+
+    act(() => {
+      result.current.onTrackLayout({
+        nativeEvent: { layout: { width: 100 } },
+      } as any);
+    });
+
+    act(() => {
+      capturedTapCallbacks.onEnd?.({ x: 80 } as any, true);
+    });
+
+    expect(onSelectMarkdownTextSizeLevel).toHaveBeenCalledWith(4);
   });
 });

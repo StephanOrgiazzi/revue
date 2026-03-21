@@ -1,17 +1,15 @@
 import { useMemo, useSyncExternalStore } from "react";
 
+import type { MarkdownTextSizeLevel, ThemeId } from "@/shared/themes/types";
+
 import { createPlatformStorage } from "@/shared/logic/platformStorage";
 import {
   DEFAULT_MARKDOWN_TEXT_SIZE_LEVEL,
   isMarkdownTextSizeLevel,
-  type MarkdownTextSizeLevel,
 } from "@/shared/themes/markdownTextSize";
-import { DEFAULT_THEME_ID, getTheme, isThemeId, type ThemeId } from "@/shared/themes/themes";
+import { DEFAULT_THEME_ID, getTheme, isThemeId } from "@/shared/themes/themes";
 
-type ThemePreferencesSnapshot = {
-  themeId: ThemeId;
-  markdownTextSizeLevel: MarkdownTextSizeLevel;
-};
+type RawThemePreferencesRecordValue = string | undefined;
 
 type ThemePreferences = ThemePreferencesSnapshot & {
   theme: ReturnType<typeof getTheme>;
@@ -24,8 +22,11 @@ type ThemePreferencesRecord = {
   markdownTextSizeLevel: MarkdownTextSizeLevel;
 };
 
-type RawThemePreferencesRecordValue = string | undefined;
 type ThemePreferencesRecordParseResult = ThemePreferencesRecord | null;
+type ThemePreferencesSnapshot = {
+  themeId: ThemeId;
+  markdownTextSizeLevel: MarkdownTextSizeLevel;
+};
 
 const THEME_PREFERENCES_STORAGE_KEY = "theme_preferences";
 
@@ -96,61 +97,6 @@ const initialThemePreferencesSnapshot = readStoredThemePreferencesSnapshot() ?? 
 let themePreferencesSnapshot: ThemePreferencesSnapshot = initialThemePreferencesSnapshot;
 const snapshotSubscribers = new Set<() => void>();
 
-function subscribeToThemePreferences(onSnapshotChange: () => void): () => void {
-  snapshotSubscribers.add(onSnapshotChange);
-
-  return () => {
-    snapshotSubscribers.delete(onSnapshotChange);
-  };
-}
-
-function getThemePreferencesSnapshot(): ThemePreferencesSnapshot {
-  return themePreferencesSnapshot;
-}
-
-function emitThemePreferencesSnapshotChange() {
-  snapshotSubscribers.forEach((subscriber) => subscriber());
-}
-
-function updateThemePreferencesSnapshot(nextSnapshot: ThemePreferencesSnapshot) {
-  const didChange =
-    nextSnapshot.themeId !== themePreferencesSnapshot.themeId ||
-    nextSnapshot.markdownTextSizeLevel !== themePreferencesSnapshot.markdownTextSizeLevel;
-
-  if (!didChange) {
-    return;
-  }
-
-  themePreferencesSnapshot = nextSnapshot;
-  emitThemePreferencesSnapshotChange();
-}
-
-function setThemeId(nextThemeId: ThemeId) {
-  if (nextThemeId === themePreferencesSnapshot.themeId) {
-    return;
-  }
-
-  const nextSnapshot: ThemePreferencesSnapshot = {
-    ...themePreferencesSnapshot,
-    themeId: nextThemeId,
-  };
-  updateThemePreferencesSnapshot(nextSnapshot);
-  scheduleThemePreferencesPersistence(nextSnapshot);
-}
-
-function setMarkdownTextSizeLevel(nextMarkdownTextSizeLevel: MarkdownTextSizeLevel) {
-  if (nextMarkdownTextSizeLevel === themePreferencesSnapshot.markdownTextSizeLevel) {
-    return;
-  }
-
-  const nextSnapshot: ThemePreferencesSnapshot = {
-    ...themePreferencesSnapshot,
-    markdownTextSizeLevel: nextMarkdownTextSizeLevel,
-  };
-  updateThemePreferencesSnapshot(nextSnapshot);
-  scheduleThemePreferencesPersistence(nextSnapshot);
-}
-
 export function useThemePreferences(): ThemePreferences {
   const snapshot = useSyncExternalStore(
     subscribeToThemePreferences,
@@ -166,4 +112,59 @@ export function useThemePreferences(): ThemePreferences {
     setThemeId,
     setMarkdownTextSizeLevel,
   };
+}
+
+function emitThemePreferencesSnapshotChange() {
+  snapshotSubscribers.forEach((subscriber) => subscriber());
+}
+
+function getThemePreferencesSnapshot(): ThemePreferencesSnapshot {
+  return themePreferencesSnapshot;
+}
+
+function setMarkdownTextSizeLevel(nextMarkdownTextSizeLevel: MarkdownTextSizeLevel) {
+  if (nextMarkdownTextSizeLevel === themePreferencesSnapshot.markdownTextSizeLevel) {
+    return;
+  }
+
+  const nextSnapshot: ThemePreferencesSnapshot = {
+    ...themePreferencesSnapshot,
+    markdownTextSizeLevel: nextMarkdownTextSizeLevel,
+  };
+  updateThemePreferencesSnapshot(nextSnapshot);
+  scheduleThemePreferencesPersistence(nextSnapshot);
+}
+
+function setThemeId(nextThemeId: ThemeId) {
+  if (nextThemeId === themePreferencesSnapshot.themeId) {
+    return;
+  }
+
+  const nextSnapshot: ThemePreferencesSnapshot = {
+    ...themePreferencesSnapshot,
+    themeId: nextThemeId,
+  };
+  updateThemePreferencesSnapshot(nextSnapshot);
+  scheduleThemePreferencesPersistence(nextSnapshot);
+}
+
+function subscribeToThemePreferences(onSnapshotChange: () => void): () => void {
+  snapshotSubscribers.add(onSnapshotChange);
+
+  return () => {
+    snapshotSubscribers.delete(onSnapshotChange);
+  };
+}
+
+function updateThemePreferencesSnapshot(nextSnapshot: ThemePreferencesSnapshot) {
+  const didChange =
+    nextSnapshot.themeId !== themePreferencesSnapshot.themeId ||
+    nextSnapshot.markdownTextSizeLevel !== themePreferencesSnapshot.markdownTextSizeLevel;
+
+  if (!didChange) {
+    return;
+  }
+
+  themePreferencesSnapshot = nextSnapshot;
+  emitThemePreferencesSnapshotChange();
 }

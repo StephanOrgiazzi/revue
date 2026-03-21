@@ -1,5 +1,5 @@
-import React from "react";
 import { render } from "@testing-library/react-native";
+import React from "react";
 import Animated from "react-native-reanimated";
 
 jest.mock("react-native-reanimated", () => {

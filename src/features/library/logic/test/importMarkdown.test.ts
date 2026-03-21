@@ -1,6 +1,6 @@
 import * as DocumentPicker from "expo-document-picker";
-import { Platform } from "react-native";
 import { StorageAccessFramework } from "expo-file-system/legacy";
+import { Platform } from "react-native";
 
 import {
   createPickedMarkdownAssetFromUri,

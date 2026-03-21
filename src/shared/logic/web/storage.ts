@@ -1,4 +1,4 @@
-import type { ReportStorageError, StorageAdapter } from "@/shared/logic/platformStorage";
+import type { ReportStorageError, StorageAdapter } from "@/shared/logic/types";
 
 export function createWebStorage(
   storageKey: string,
@@ -12,7 +12,7 @@ export function createWebStorage(
   function readLocalStorageValue(): string | undefined {
     try {
       const value = globalThis.localStorage?.getItem(storageKey);
-      if (value == null || value === "") {
+      if (value === null || value === undefined || value === "") {
         return undefined;
       }
 

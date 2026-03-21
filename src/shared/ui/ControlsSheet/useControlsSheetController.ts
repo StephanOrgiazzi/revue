@@ -1,4 +1,5 @@
 import type { BottomSheetModal } from "@gorhom/bottom-sheet";
+
 import { useCallback, useEffect, useRef } from "react";
 
 type UseControlsSheetControllerParams = {

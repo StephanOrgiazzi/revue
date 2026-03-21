@@ -2,18 +2,18 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 import { useReaderPosition } from "@/features/reader/hooks/useReaderPosition";
 import {
-  readLibraryItemReadingPosition,
-  saveLibraryItemReadingPosition,
-} from "@/features/library/logic/libraryRepository";
+  readArticleReadingPosition,
+  saveArticleReadingPosition,
+} from "@/features/reader/logic/readerRepository";
 import {
   resolveAnchorScrollOffset,
   resolveHeadingForScrollOffset,
   TITLE_TOC_BLOCK_INDEX,
 } from "@/features/reader/logic/readerTableOfContents";
 
-jest.mock("@/features/library/logic/libraryRepository", () => ({
-  readLibraryItemReadingPosition: jest.fn(() => ({ anchorSlug: null, scrollOffsetY: null })),
-  saveLibraryItemReadingPosition: jest.fn(),
+jest.mock("@/features/reader/logic/readerRepository", () => ({
+  readArticleReadingPosition: jest.fn(() => ({ anchorSlug: null, scrollOffsetY: null })),
+  saveArticleReadingPosition: jest.fn(),
 }));
 
 jest.mock("@/features/reader/logic/readerTableOfContents", () => ({
@@ -34,7 +34,7 @@ describe("useReaderPosition", () => {
   });
 
   it("restores stored scroll offset after content is measured", async () => {
-    (readLibraryItemReadingPosition as jest.Mock).mockReturnValue({
+    (readArticleReadingPosition as jest.Mock).mockReturnValue({
       anchorSlug: "h-2",
       scrollOffsetY: 250,
     });
@@ -63,7 +63,7 @@ describe("useReaderPosition", () => {
   });
 
   it("restores using stored anchor when no scroll offset is persisted", async () => {
-    (readLibraryItemReadingPosition as jest.Mock).mockReturnValue({
+    (readArticleReadingPosition as jest.Mock).mockReturnValue({
       anchorSlug: "h-1",
       scrollOffsetY: null,
     });
@@ -131,7 +131,7 @@ describe("useReaderPosition", () => {
       } as any);
       result.current.persistReadingPosition();
     });
-    expect(saveLibraryItemReadingPosition).toHaveBeenCalledWith("a-4", {
+    expect(saveArticleReadingPosition).toHaveBeenCalledWith("a-4", {
       anchorSlug: null,
       scrollOffsetY: null,
     });
@@ -142,7 +142,7 @@ describe("useReaderPosition", () => {
       } as any);
       result.current.persistReadingPosition();
     });
-    expect(saveLibraryItemReadingPosition).toHaveBeenCalledWith("a-4", {
+    expect(saveArticleReadingPosition).toHaveBeenCalledWith("a-4", {
       anchorSlug: "h-1",
       scrollOffsetY: 246,
     });

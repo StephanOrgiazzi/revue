@@ -1,9 +1,10 @@
-import { Platform } from "react-native";
 import { Directory, File } from "expo-file-system";
+import { Platform } from "react-native";
+
 import { createWebStorage } from "@/shared/logic/web/storage";
 
 // We want to test the actual implementation
-const { createPlatformStorage } = jest.requireActual(".././platformStorage");
+const { createPlatformStorage } = jest.requireActual("@/shared/logic/platformStorage");
 
 jest.mock("@/shared/logic/web/storage", () => ({
   createWebStorage: jest.fn(),

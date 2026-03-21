@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { RenderHTMLConfigProvider, TRenderEngineProvider } from "react-native-render-html";
+import { useCallback, useMemo, useState } from "react";
 import {
   Text,
   View,
@@ -9,12 +8,16 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from "react-native";
+import { RenderHTMLConfigProvider, TRenderEngineProvider } from "react-native-render-html";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import type { Theme } from "@/shared/themes/types";
 
 import { ReaderArticleContent } from "@/features/reader/components/ReaderArticleContent";
 import { ReaderArticleHeader } from "@/features/reader/components/ReaderArticleHeader";
 import { ReaderControlsOverlay } from "@/features/reader/components/ReaderControlsOverlay";
 import { ReaderEmptyState } from "@/features/reader/components/ReaderEmptyState";
+import { readerHtmlRenderers } from "@/features/reader/components/ReaderHtmlRenderers";
 import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
 import { useReaderArticle } from "@/features/reader/hooks/useReaderArticle";
 import { useReaderFloatingMenuVisibility } from "@/features/reader/hooks/useReaderFloatingMenuVisibility";
@@ -43,7 +46,6 @@ export function ReaderScreen() {
   const {
     htmlStyles,
     htmlSystemFonts,
-    htmlRenderers,
     htmlRenderersProps,
     htmlBlocks,
     shouldShowArticleHeader,
@@ -85,16 +87,19 @@ export function ReaderScreen() {
     isLoading,
   });
 
-  const [hasRenderedArticleContent, setHasRenderedArticleContent] = useState(false);
-  useEffect(() => {
-    setHasRenderedArticleContent(false);
-  }, [article?.id, isLoading]);
+  const articleContentRenderKey = `${article?.id ?? "no-article"}:${isLoading ? "loading" : "ready"}`;
+
+  const [renderedArticleContentKey, setRenderedArticleContentKey] = useState<string | null>(null);
+
+  const hasRenderedArticleContent =
+    !isLoading && renderedArticleContentKey === articleContentRenderKey;
+
   const handleContentSizeChangeWithFloatingMenu = useCallback(() => {
     handleContentSizeChange();
     if (!isLoading) {
-      setHasRenderedArticleContent(true);
+      setRenderedArticleContentKey(articleContentRenderKey);
     }
-  }, [handleContentSizeChange, isLoading]);
+  }, [articleContentRenderKey, handleContentSizeChange, isLoading]);
 
   const {
     isFloatingMenuButtonVisible,
@@ -166,11 +171,7 @@ export function ReaderScreen() {
       <StatusBar style={theme.isDark ? "light" : "dark"} />
 
       {hasError ? (
-        <View className="px-5 py-6">
-          <Text className="text-base leading-6" style={{ color: theme.colors.error }}>
-            {errorMessage}
-          </Text>
-        </View>
+        <ReaderErrorState errorColor={theme.colors.error} errorMessage={errorMessage} />
       ) : (
         <View style={{ flex: 1 }}>
           <TRenderEngineProvider
@@ -180,7 +181,7 @@ export function ReaderScreen() {
             classesStyles={htmlStyles.classesStyles}
           >
             <RenderHTMLConfigProvider
-              renderers={htmlRenderers}
+              renderers={readerHtmlRenderers}
               renderersProps={htmlRenderersProps}
               enableExperimentalMarginCollapsing
             >
@@ -205,27 +206,13 @@ export function ReaderScreen() {
           </TRenderEngineProvider>
         </View>
       )}
-      {!hasError && isRestoringReadingPosition ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            backgroundColor: pageBackgroundColor,
-          }}
-        >
-          <ReaderSkeleton
-            theme={theme}
-            contentWidth={htmlContentWidth}
-            horizontalPadding={horizontalPadding}
-            verticalPadding={0}
-            showHeader={false}
-          />
-        </View>
-      ) : null}
+      <ReaderRestoringOverlay
+        visible={!hasError && isRestoringReadingPosition}
+        backgroundColor={pageBackgroundColor}
+        theme={theme}
+        contentWidth={htmlContentWidth}
+        horizontalPadding={horizontalPadding}
+      />
 
       <ReaderControlsOverlay
         isFloatingMenuVisible={shouldDisplayFloatingMenu}
@@ -242,5 +229,49 @@ export function ReaderScreen() {
         onExitReader={handleExitReader}
       />
     </ScreenContainer>
+  );
+}
+
+function ReaderErrorState(props: { errorColor: string; errorMessage: string | null }) {
+  return (
+    <View className="px-5 py-6">
+      <Text className="text-base leading-6" style={{ color: props.errorColor }}>
+        {props.errorMessage}
+      </Text>
+    </View>
+  );
+}
+
+function ReaderRestoringOverlay(props: {
+  visible: boolean;
+  backgroundColor: string;
+  theme: Theme;
+  contentWidth: number;
+  horizontalPadding: number;
+}) {
+  if (!props.visible) {
+    return null;
+  }
+
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        backgroundColor: props.backgroundColor,
+      }}
+    >
+      <ReaderSkeleton
+        theme={props.theme}
+        contentWidth={props.contentWidth}
+        horizontalPadding={props.horizontalPadding}
+        verticalPadding={0}
+        showHeader={false}
+      />
+    </View>
   );
 }

@@ -3,11 +3,9 @@ import { Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 
-import {
-  MARKDOWN_TEXT_SIZE_LEVELS,
-  type MarkdownTextSizeLevel,
-} from "@/shared/themes/markdownTextSize";
-import type { Theme } from "@/shared/themes/themes";
+import type { MarkdownTextSizeLevel, Theme } from "@/shared/themes/types";
+
+import { MARKDOWN_TEXT_SIZE_LEVELS } from "@/shared/themes/markdownTextSize";
 import { useMarkdownTextSizeSlider } from "@/shared/ui/MarkdownTextSizeSection/useMarkdownTextSizeSlider";
 
 type MarkdownTextSizeSectionProps = {

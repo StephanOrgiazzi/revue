@@ -1,5 +1,5 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 
 import { ReaderScreen } from "@/features/reader/screens/ReaderScreen";
 
@@ -71,7 +71,6 @@ jest.mock("@/features/reader/hooks/useReaderScreenViewModel", () => ({
   useReaderScreenViewModel: () => ({
     htmlStyles: { baseStyle: {}, tagsStyles: {}, classesStyles: {} },
     htmlSystemFonts: [],
-    htmlRenderers: {},
     htmlRenderersProps: {},
     htmlBlocks: ["<p>content</p>"],
     shouldShowArticleHeader: true,

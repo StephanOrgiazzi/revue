@@ -1,5 +1,5 @@
-import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
 type ScreenContainerProps = {
   children: React.ReactNode;

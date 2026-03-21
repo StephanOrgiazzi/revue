@@ -1,9 +1,9 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 import { Animated } from "react-native";
 
-import { FloatingMenuButton } from "@/shared/ui/FloatingMenuButton";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
+import { FloatingMenuButton } from "@/shared/ui/FloatingMenuButton";
 
 describe("FloatingMenuButton", () => {
   afterEach(() => {

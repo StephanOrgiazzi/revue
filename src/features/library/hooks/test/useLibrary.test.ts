@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { useLibrary } from ".././useLibrary";
 import * as Linking from "expo-linking";
+
+import { useLibrary } from "@/features/library/hooks/useLibrary";
 import {
   readInitialLibrarySnapshot,
   importLibraryItemFromPicker,

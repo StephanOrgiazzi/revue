@@ -1,5 +1,6 @@
 import type { Token } from "marked";
-import { buildHtmlBlocksAndHeadings } from ".././chunking";
+
+import { buildHtmlBlocksAndHeadings } from "@/features/reader/logic/markdown/chunking";
 
 describe("chunking", () => {
   const mockRender = (tokens: Token[]) => tokens.map((t) => (t as any).text || "html").join(",");

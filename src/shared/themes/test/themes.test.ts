@@ -1,5 +1,5 @@
 import { THEME_IDS } from "@/shared/themes/themePrimitives";
-import { isThemeId, getTheme, DEFAULT_THEME_ID, THEME_OPTIONS } from ".././themes";
+import { isThemeId, getTheme, DEFAULT_THEME_ID, THEME_OPTIONS } from "@/shared/themes/themes";
 
 describe("themes", () => {
   describe("isThemeId", () => {

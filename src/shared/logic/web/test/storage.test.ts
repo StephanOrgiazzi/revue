@@ -1,4 +1,4 @@
-import { createWebStorage } from ".././storage";
+import { createWebStorage } from "@/shared/logic/web/storage";
 
 describe("createWebStorage", () => {
   let mockReportError: jest.Mock;

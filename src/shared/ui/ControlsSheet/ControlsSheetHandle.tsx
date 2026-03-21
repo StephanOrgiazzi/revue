@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 
-import type { Theme } from "@/shared/themes/themes";
+import type { Theme } from "@/shared/themes/types";
 
 type ControlsSheetHandleProps = {
   theme: Theme;

@@ -1,10 +1,9 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-
-import { MarkdownTextSizeSection } from "@/shared/ui/MarkdownTextSizeSection";
-import { lightTheme } from "@/shared/themes/definitions/lightTheme";
-
+import React from "react";
 import { Gesture } from "react-native-gesture-handler";
+
+import { lightTheme } from "@/shared/themes/definitions/lightTheme";
+import { MarkdownTextSizeSection } from "@/shared/ui/MarkdownTextSizeSection";
 
 const mockUseMarkdownTextSizeSlider = jest.fn();
 

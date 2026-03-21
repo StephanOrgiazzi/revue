@@ -1,20 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
+
 import { LibraryGrid } from "@/features/library/components/LibraryGrid";
 import { useLibrary } from "@/features/library/hooks/useLibrary";
 import { triggerLongPressHaptic, triggerSelectionTickHaptic } from "@/shared/logic/haptics";
 import { useDisclosure } from "@/shared/logic/useDisclosure";
-import { ControlsSheet } from "@/shared/ui/ControlsSheet";
-import { FloatingMenuButton } from "@/shared/ui/FloatingMenuButton";
 import { THEME_OPTIONS } from "@/shared/themes/themes";
 import { useThemePreferences } from "@/shared/themes/useThemePreferences";
 import { ActionDialog } from "@/shared/ui/ActionDialog";
+import { ControlsSheet } from "@/shared/ui/ControlsSheet";
+import { FloatingMenuButton } from "@/shared/ui/FloatingMenuButton";
 import { ScreenContainer } from "@/shared/ui/ScreenContainer";
 
 export const LibraryScreen = () => {

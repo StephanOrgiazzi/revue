@@ -12,14 +12,16 @@ export type ReaderHeading = {
   blockIndex: number;
 };
 
+export type ReaderHeadingRenderToken = Token & {
+  readerClassNames?: string[];
+};
+
 export type ReaderHtmlBlocksResult = {
   htmlBlocks: string[];
   headings: ReaderHeading[];
 };
 
-export type ReaderHeadingRenderToken = Token & {
-  readerClassNames?: string[];
-};
+export type ReaderMarkdownToken = Token;
 
 export type ReaderMathToken = Token & {
   type: typeof READER_MATH_BLOCK_TOKEN_TYPE | typeof READER_MATH_INLINE_TOKEN_TYPE;

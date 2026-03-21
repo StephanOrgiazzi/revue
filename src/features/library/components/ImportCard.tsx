@@ -1,8 +1,9 @@
 import { memo } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
+import type { Theme } from "@/shared/themes/types";
+
 import { triggerContextClickHaptic } from "@/shared/logic/haptics";
-import type { Theme } from "@/shared/themes/themes";
 
 type ImportCardProps = {
   theme: Theme;

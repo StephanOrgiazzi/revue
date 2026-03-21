@@ -1,4 +1,4 @@
-import type { TableOfContentsHeading } from "@/shared/ui/TableOfContentsSection";
+import type { TableOfContentsHeading } from "@/shared/ui/types";
 
 const READER_SHEET_SNAP_POINT = "82%";
 
@@ -7,6 +7,15 @@ const READER_SHEET_SNAP_POINT_RATIO = 0.82;
 const READER_TOC_RESERVED_HEIGHT = 160;
 
 export const EMPTY_HEADINGS: TableOfContentsHeading[] = [];
+
+type ControlsSheetLayoutConfig = {
+  isReaderSheet: boolean;
+  snapPoints: (string | number)[] | undefined;
+  isShowingTableOfContentsPanel: boolean;
+  isShowingSettingsPanel: boolean;
+  tocListMaxHeight: number;
+  sheetTitle: string;
+};
 
 type GetControlsSheetLayoutConfigParams = {
   showTableOfContents: boolean;
@@ -17,15 +26,6 @@ type GetControlsSheetLayoutConfigParams = {
   windowHeight: number;
   topInset: number;
   sheetBottomPadding: number;
-};
-
-type ControlsSheetLayoutConfig = {
-  isReaderSheet: boolean;
-  snapPoints: (string | number)[] | undefined;
-  isShowingTableOfContentsPanel: boolean;
-  isShowingSettingsPanel: boolean;
-  tocListMaxHeight: number;
-  sheetTitle: string;
 };
 
 export function getControlsSheetLayoutConfig({

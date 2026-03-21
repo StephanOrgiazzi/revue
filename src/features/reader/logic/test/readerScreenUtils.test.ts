@@ -3,7 +3,7 @@ import {
   buildListMarkerRenderersProps,
   shouldShowHeaderFromHtmlBlocks,
   buildArticleMeta,
-} from ".././readerScreenUtils";
+} from "@/features/reader/logic/readerScreenUtils";
 
 jest.mock("expo-constants", () => ({
   systemFonts: ["ExpoFont"],

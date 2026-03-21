@@ -1,11 +1,12 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { FlatList, type LayoutChangeEvent, View } from "react-native";
 
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
+import type { Theme } from "@/shared/themes/types";
+
 import { ArticleCard } from "@/features/library/components/ArticleCard";
 import { ImportCard } from "@/features/library/components/ImportCard";
 import { buildCardPalettesForGrid } from "@/features/library/logic/libraryItemViewModel";
-import type { Theme } from "@/shared/themes/themes";
 
 type LibraryGridCard =
   | { kind: "import" }

@@ -7,14 +7,30 @@ import { useFocusEffect } from "@react-navigation/native";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { Text, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 
-import { triggerFrequentTickHaptic, triggerSelectionTickHaptic } from "@/shared/logic/haptics";
-import type { Theme } from "@/shared/themes/themes";
+import type { Theme } from "@/shared/themes/types";
+import type { TableOfContentsHeading } from "@/shared/ui/types";
 
-export type TableOfContentsHeading = {
-  slug: string;
-  text: string;
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-  blockIndex: number;
+import { triggerFrequentTickHaptic, triggerSelectionTickHaptic } from "@/shared/logic/haptics";
+
+type TableOfContentsDataList = ArrayLike<TableOfContentsHeading> | null | undefined;
+
+type TableOfContentsItemProps = {
+  heading: TableOfContentsHeading;
+  index: number;
+  isActive: boolean;
+  theme: Theme;
+  onSelectHeading: (heading: TableOfContentsHeading) => void;
+};
+
+type TableOfContentsRenderItemParams = {
+  item: TableOfContentsHeading;
+  index: number;
+};
+
+type TableOfContentsScrollToIndexError = {
+  index: number;
+  highestMeasuredFrameIndex: number;
+  averageItemLength: number;
 };
 
 type TableOfContentsSectionProps = {
@@ -27,24 +43,126 @@ type TableOfContentsSectionProps = {
   showBottomDivider?: boolean;
 };
 
-type TableOfContentsRenderItemParams = {
-  item: TableOfContentsHeading;
-  index: number;
-};
-
-type TableOfContentsDataList = ArrayLike<TableOfContentsHeading> | null | undefined;
-
-type TableOfContentsScrollToIndexError = {
-  index: number;
-  highestMeasuredFrameIndex: number;
-  averageItemLength: number;
-};
-
 const TOC_ITEM_TOTAL_HEIGHT = 58;
 
 const TOC_LIST_BOTTOM_PADDING = 12;
 
 const TOC_SCROLL_HAPTIC_COOLDOWN_MS = 45;
+
+function TableOfContentsEmptyState({ theme }: { theme: Theme }) {
+  return (
+    <Text className="mb-2 text-sm leading-5" style={{ color: theme.colors.textMuted }}>
+      No headings found in this article.
+    </Text>
+  );
+}
+
+function TableOfContentsItem({
+  heading,
+  index,
+  isActive,
+  theme,
+  onSelectHeading,
+}: TableOfContentsItemProps) {
+  const isPaperLikeTheme = theme.id === "paper" || theme.id === "light";
+
+  return (
+    <TouchableOpacity
+      style={[
+        {
+          borderRadius: 16,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          marginBottom: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        },
+        {
+          backgroundColor: isActive ? theme.colors.tocItemActiveBackground : "transparent",
+          borderColor: isPaperLikeTheme ? theme.colors.surfaceBorder : "transparent",
+          borderWidth: isPaperLikeTheme ? 1 : 0,
+        },
+      ]}
+      onPress={() => {
+        triggerSelectionTickHaptic();
+        onSelectHeading(heading);
+      }}
+    >
+      <View className="shrink flex-row items-center">
+        <Text
+          className="mr-[14px] text-base font-bold leading-5 tracking-[0.4px]"
+          style={{ color: theme.colors.textMuted }}
+        >
+          {String(index + 1).padStart(2, "0")}
+        </Text>
+        <Text
+          numberOfLines={1}
+          className="shrink text-base font-medium leading-6"
+          style={{
+            color: isActive ? theme.colors.headingPrimary : theme.colors.textSecondary,
+          }}
+        >
+          {heading.text}
+        </Text>
+      </View>
+      {isActive ? (
+        <View className="h-2 w-2 rounded-full" style={{ backgroundColor: theme.colors.accent }} />
+      ) : null}
+    </TouchableOpacity>
+  );
+}
+
+function useTableOfContentsScrollHaptics(visible: boolean, headingCount: number) {
+  const isUserScrollingRef = useRef(false);
+  const lastHapticIndexRef = useRef<number | null>(null);
+  const lastHapticAtMsRef = useRef(0);
+
+  const handleTocScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (!visible || !isUserScrollingRef.current || headingCount === 0) {
+        return;
+      }
+
+      const rawIndex = Math.round(event.nativeEvent.contentOffset.y / TOC_ITEM_TOTAL_HEIGHT);
+      const clampedIndex = Math.max(0, Math.min(headingCount - 1, rawIndex));
+      if (clampedIndex === lastHapticIndexRef.current) {
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastHapticAtMsRef.current < TOC_SCROLL_HAPTIC_COOLDOWN_MS) {
+        return;
+      }
+
+      lastHapticIndexRef.current = clampedIndex;
+      lastHapticAtMsRef.current = now;
+      triggerFrequentTickHaptic();
+    },
+    [headingCount, visible],
+  );
+
+  const handleTocScrollBeginDrag = useCallback(() => {
+    isUserScrollingRef.current = true;
+  }, []);
+
+  const handleTocScrollEndDrag = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (Math.abs(event.nativeEvent.velocity?.y ?? 0) < 0.05) {
+      isUserScrollingRef.current = false;
+    }
+  }, []);
+
+  const handleTocMomentumEnd = useCallback(() => {
+    isUserScrollingRef.current = false;
+  }, []);
+
+  return {
+    handleTocScroll,
+    handleTocScrollBeginDrag,
+    handleTocScrollEndDrag,
+    handleTocMomentumEnd,
+  };
+}
 
 export const TableOfContentsSection = memo(
   ({
@@ -57,12 +175,6 @@ export const TableOfContentsSection = memo(
     showBottomDivider = true,
   }: TableOfContentsSectionProps) => {
     const tocListRef = useRef<BottomSheetFlatListMethods>(null);
-
-    const isUserScrollingRef = useRef(false);
-
-    const lastHapticIndexRef = useRef<number | null>(null);
-
-    const lastHapticAtMsRef = useRef(0);
 
     const filteredHeadings = useMemo(
       () => headings.filter((heading) => heading.level <= 3),
@@ -88,6 +200,13 @@ export const TableOfContentsSection = memo(
       });
     }, [activeHeadingIndex]);
 
+    const {
+      handleTocScroll,
+      handleTocScrollBeginDrag,
+      handleTocScrollEndDrag,
+      handleTocMomentumEnd,
+    } = useTableOfContentsScrollHaptics(visible, filteredHeadings.length);
+
     useEffect(() => {
       if (!visible) {
         return;
@@ -104,103 +223,18 @@ export const TableOfContentsSection = memo(
 
     const renderHeadingItem = useCallback(
       ({ item, index }: TableOfContentsRenderItemParams) => {
-        const isActive = activeHeadingSlug === item.slug;
-
         return (
-          <TouchableOpacity
-            style={[
-              {
-                borderRadius: 16,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                marginBottom: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              },
-              {
-                backgroundColor: isActive ? theme.colors.tocItemActiveBackground : "transparent",
-                borderColor:
-                  theme.id === "paper" || theme.id === "light"
-                    ? theme.colors.surfaceBorder
-                    : "transparent",
-                borderWidth: theme.id === "paper" || theme.id === "light" ? 1 : 0,
-              },
-            ]}
-            onPress={() => {
-              triggerSelectionTickHaptic();
-              onSelectHeading(item);
-            }}
-          >
-            <View className="shrink flex-row items-center">
-              <Text
-                className="mr-[14px] text-base font-bold leading-5 tracking-[0.4px]"
-                style={{ color: theme.colors.textMuted }}
-              >
-                {String(index + 1).padStart(2, "0")}
-              </Text>
-              <Text
-                numberOfLines={1}
-                className="shrink text-base font-medium leading-6"
-                style={{
-                  color: isActive ? theme.colors.headingPrimary : theme.colors.textSecondary,
-                }}
-              >
-                {item.text}
-              </Text>
-            </View>
-            {isActive ? (
-              <View
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: theme.colors.accent }}
-              />
-            ) : null}
-          </TouchableOpacity>
+          <TableOfContentsItem
+            heading={item}
+            index={index}
+            isActive={activeHeadingSlug === item.slug}
+            theme={theme}
+            onSelectHeading={onSelectHeading}
+          />
         );
       },
       [activeHeadingSlug, onSelectHeading, theme],
     );
-
-    const handleTocScroll = useCallback(
-      (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if (!visible || !isUserScrollingRef.current || filteredHeadings.length === 0) {
-          return;
-        }
-
-        const rawIndex = Math.round(event.nativeEvent.contentOffset.y / TOC_ITEM_TOTAL_HEIGHT);
-
-        const clampedIndex = Math.max(0, Math.min(filteredHeadings.length - 1, rawIndex));
-
-        if (clampedIndex === lastHapticIndexRef.current) {
-          return;
-        }
-
-        const now = Date.now();
-        if (now - lastHapticAtMsRef.current < TOC_SCROLL_HAPTIC_COOLDOWN_MS) {
-          return;
-        }
-
-        lastHapticIndexRef.current = clampedIndex;
-        lastHapticAtMsRef.current = now;
-        triggerFrequentTickHaptic();
-      },
-      [filteredHeadings.length, visible],
-    );
-
-    const handleTocScrollBeginDrag = useCallback(() => {
-      isUserScrollingRef.current = true;
-    }, []);
-
-    const handleTocScrollEndDrag = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const velocityY = Math.abs(event.nativeEvent.velocity?.y ?? 0);
-      if (velocityY < 0.05) {
-        isUserScrollingRef.current = false;
-      }
-    }, []);
-
-    const handleTocMomentumEnd = useCallback(() => {
-      isUserScrollingRef.current = false;
-    }, []);
 
     return (
       <>
@@ -245,11 +279,7 @@ export const TableOfContentsSection = memo(
           maxToRenderPerBatch={8}
           windowSize={4}
           removeClippedSubviews
-          ListEmptyComponent={
-            <Text className="mb-2 text-sm leading-5" style={{ color: theme.colors.textMuted }}>
-              No headings found in this article.
-            </Text>
-          }
+          ListEmptyComponent={<TableOfContentsEmptyState theme={theme} />}
         />
 
         {showBottomDivider ? (

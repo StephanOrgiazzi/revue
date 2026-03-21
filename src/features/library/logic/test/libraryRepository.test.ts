@@ -1,15 +1,17 @@
+import { File } from "expo-file-system";
+
+import type { LibraryItem } from "@/shared/library/types";
+
+import { sortLibraryItems } from "@/features/library/logic/libraryItemViewModel";
 import {
+  deleteLibraryItem,
   readLibraryItems,
   readLibraryItemById,
-  saveLibraryItem,
-  deleteLibraryItem,
   readLibraryItemReadingPosition,
+  saveLibraryItem,
   saveLibraryItemReadingPosition,
-} from ".././libraryRepository";
-import { getLibraryIndex, saveLibraryIndex } from ".././libraryIndexStorage";
-import { sortLibraryItems } from ".././libraryItemViewModel";
-import { File } from "expo-file-system";
-import type { LibraryItem } from ".././types";
+} from "@/features/library/logic/libraryRepository";
+import { getLibraryIndex, saveLibraryIndex } from "@/shared/library/libraryIndexStorage";
 
 const mockDirectoryInstances: Array<{ uri: string; delete: jest.Mock }> = [];
 
@@ -32,7 +34,7 @@ function mockJoinFsUri(parts: unknown[]): string {
   }, "");
 }
 
-jest.mock("@/features/library/logic/libraryIndexStorage");
+jest.mock("@/shared/library/libraryIndexStorage");
 jest.mock("@/features/library/logic/libraryItemViewModel");
 jest.mock("@/shared/logic/platformStorage", () => ({
   createPlatformStorage: jest.fn(() => ({

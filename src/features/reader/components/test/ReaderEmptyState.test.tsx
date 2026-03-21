@@ -1,5 +1,5 @@
-import React from "react";
 import { render } from "@testing-library/react-native";
+import React from "react";
 
 import { ReaderEmptyState } from "@/features/reader/components/ReaderEmptyState";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";

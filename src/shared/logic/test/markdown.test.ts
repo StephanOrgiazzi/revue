@@ -2,7 +2,7 @@ import {
   normalizeMarkdownLineEndings,
   extractMarkdownFrontMatter,
   parseMarkdownDocument,
-} from ".././markdown";
+} from "@/shared/logic/markdown";
 
 describe("markdown utility", () => {
   describe("normalizeMarkdownLineEndings", () => {

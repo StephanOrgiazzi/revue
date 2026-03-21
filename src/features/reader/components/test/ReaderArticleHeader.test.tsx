@@ -1,5 +1,5 @@
-import React from "react";
 import { render } from "@testing-library/react-native";
+import React from "react";
 
 import { ReaderArticleHeader } from "@/features/reader/components/ReaderArticleHeader";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";

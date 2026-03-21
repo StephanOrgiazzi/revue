@@ -1,11 +1,10 @@
 import { memo } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import type { LibraryItem, LibraryItemId } from "@/features/library/logic/types";
-import {
-  cardPaletteForTitle,
-  type CardPalette,
-} from "@/features/library/logic/libraryItemViewModel";
+import type { CardPalette } from "@/features/library/logic/types";
+import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
+
+import { cardPaletteForTitle } from "@/features/library/logic/libraryItemViewModel";
 import { formatArticleDate } from "@/shared/logic/formatArticleDate";
 
 type ArticleCardProps = {

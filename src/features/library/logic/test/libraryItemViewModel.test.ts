@@ -1,9 +1,10 @@
+import type { LibraryItem } from "@/shared/library/types";
+
 import {
-  sortLibraryItems,
-  cardPaletteForTitle,
   buildCardPalettesForGrid,
-} from ".././libraryItemViewModel";
-import type { LibraryItem } from ".././types";
+  cardPaletteForTitle,
+  sortLibraryItems,
+} from "@/features/library/logic/libraryItemViewModel";
 
 describe("libraryItemViewModel", () => {
   const mockItems: LibraryItem[] = [

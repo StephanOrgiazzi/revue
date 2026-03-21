@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 
-import { readerHtmlRenderers } from "@/features/reader/components/ReaderHtmlRenderers";
+import type { MarkdownTextSizeLevel } from "@/shared/themes/types";
+
+import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 import { createReaderHtmlStyles } from "@/features/reader/logic/readerHtmlStyles";
 import {
   buildArticleMeta,
@@ -10,10 +12,8 @@ import {
   MIN_HTML_CONTENT_WIDTH,
   shouldShowHeaderFromHtmlBlocks,
 } from "@/features/reader/logic/readerScreenUtils";
-import { renderMarkdownToHtmlBlocksWithHeadings } from "@/features/reader/logic/markdownRenderer";
 import { buildReaderTocHeadings } from "@/features/reader/logic/readerTableOfContents";
 import { formatArticleDate } from "@/shared/logic/formatArticleDate";
-import type { MarkdownTextSizeLevel } from "@/shared/themes/markdownTextSize";
 import { useThemePreferences } from "@/shared/themes/useThemePreferences";
 
 type UseReaderScreenViewModelInput = {
@@ -43,8 +43,6 @@ export function useReaderScreenViewModel({
   );
 
   const htmlSystemFonts = useMemo(() => buildHtmlSystemFonts(), []);
-
-  const htmlRenderers = readerHtmlRenderers;
 
   const htmlRenderersProps = useMemo(
     () => buildListMarkerRenderersProps(theme.colors.listMarker),
@@ -101,7 +99,6 @@ export function useReaderScreenViewModel({
   return {
     htmlStyles,
     htmlSystemFonts,
-    htmlRenderers,
     htmlRenderersProps,
     htmlBlocks,
     shouldShowArticleHeader,

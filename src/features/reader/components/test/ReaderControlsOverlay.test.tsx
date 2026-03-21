@@ -1,5 +1,5 @@
-import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import React from "react";
 
 import { ReaderControlsOverlay } from "@/features/reader/components/ReaderControlsOverlay";
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
