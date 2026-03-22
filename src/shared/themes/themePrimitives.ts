@@ -1,11 +1,4 @@
-import {
-  THEME_IDS as THEME_IDS_BASE,
-  type Theme,
-  type ThemeColors,
-  type ThemeId,
-} from "@/shared/themes/types";
-
-export const THEME_IDS = THEME_IDS_BASE;
+import { type Theme, type ThemeColors, type ThemeId } from "@/shared/themes/types";
 
 type ThemeColorPalette = {
   pageBackground: string;

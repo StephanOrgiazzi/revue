@@ -1,9 +1,6 @@
-import {
-  MARKDOWN_TEXT_SIZE_LEVELS as MARKDOWN_TEXT_SIZE_LEVELS_BASE,
-  type MarkdownTextSizeLevel,
-} from "@/shared/themes/types";
+import type { MarkdownTextSizeLevel } from "@/shared/themes/types";
 
-export const MARKDOWN_TEXT_SIZE_LEVELS = MARKDOWN_TEXT_SIZE_LEVELS_BASE;
+export const MARKDOWN_TEXT_SIZE_LEVELS = [1, 2, 3, 4, 5] as const;
 
 export const DEFAULT_MARKDOWN_TEXT_SIZE_LEVEL: MarkdownTextSizeLevel = 3;
 

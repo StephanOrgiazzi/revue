@@ -6,12 +6,14 @@ import { sortLibraryItems } from "@/features/library/logic/libraryItemViewModel"
 import {
   deleteLibraryItem,
   readLibraryItems,
-  readLibraryItemById,
-  readLibraryItemReadingPosition,
   saveLibraryItem,
-  saveLibraryItemReadingPosition,
 } from "@/features/library/logic/libraryRepository";
 import { getLibraryIndex, saveLibraryIndex } from "@/shared/library/libraryIndexStorage";
+import {
+  readLibraryItemById,
+  readLibraryItemReadingPosition,
+  saveLibraryItemReadingPosition,
+} from "@/shared/library/libraryStore";
 
 function getNextFsUriPart(part: unknown): string {
   if (typeof part === "string") {

@@ -1,11 +1,9 @@
-import type { Theme, ThemeId, ThemeOption } from "@/shared/themes/types";
-
 import { lightTheme } from "@/shared/themes/definitions/lightTheme";
 import { midnightTheme } from "@/shared/themes/definitions/midnightTheme";
 import { paperTheme } from "@/shared/themes/definitions/paperTheme";
 import { pureDarkTheme } from "@/shared/themes/definitions/pureDarkTheme";
 import { velvetTheme } from "@/shared/themes/definitions/velvetTheme";
-import { THEME_IDS } from "@/shared/themes/themePrimitives";
+import { THEME_IDS, type Theme, type ThemeId, type ThemeOption } from "@/shared/themes/types";
 
 const THEME_LABELS: Record<ThemeId, string> = {
   light: "Light",

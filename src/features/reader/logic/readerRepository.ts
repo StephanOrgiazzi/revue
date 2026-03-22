@@ -17,7 +17,6 @@ import { canReadTextFromWebUri, readTextFromWebUri } from "@/shared/logic/web/te
 const DATA_IMAGE_BASE64_PATTERN = /(data:image\/[a-z0-9.+-]+;base64,)[a-z0-9+/=_\r\n-]+/gi;
 
 type ReadArticleByIdResult = LibraryItem | null;
-
 type ReadArticleContentOptions = {
   signal?: AbortSignal;
 };
@@ -28,7 +27,12 @@ export function getSingleRouteParam(value: SingleRouteParamValue): LibraryItemId
 }
 
 export function readArticleById(articleId: LibraryItemId): ReadArticleByIdResult {
-  return readLibraryItemById(articleId);
+  const normalizedArticleId = normalizeArticleId(articleId);
+  if (!normalizedArticleId) {
+    return null;
+  }
+
+  return readLibraryItemById(normalizedArticleId);
 }
 
 export async function readArticleContent(
@@ -48,14 +52,49 @@ export async function readArticleContent(
 }
 
 export function readArticleReadingPosition(articleId: LibraryItemId): LibraryItemReadingPosition {
-  return readLibraryItemReadingPosition(articleId);
+  const normalizedArticleId = normalizeArticleId(articleId);
+  if (!normalizedArticleId) {
+    return {
+      anchorSlug: null,
+      scrollOffsetY: null,
+    };
+  }
+
+  const position = readLibraryItemReadingPosition(normalizedArticleId);
+  return {
+    anchorSlug: normalizeAnchorSlug(position.anchorSlug),
+    scrollOffsetY: normalizeScrollOffsetY(position.scrollOffsetY),
+  };
 }
 
 export function saveArticleReadingPosition(
   articleId: LibraryItemId,
   position: LibraryItemReadingPosition,
 ): void {
-  saveLibraryItemReadingPosition(articleId, position);
+  const normalizedArticleId = normalizeArticleId(articleId);
+  if (!normalizedArticleId) {
+    return;
+  }
+
+  saveLibraryItemReadingPosition(normalizedArticleId, {
+    anchorSlug: normalizeAnchorSlug(position.anchorSlug),
+    scrollOffsetY: normalizeScrollOffsetY(position.scrollOffsetY),
+  });
+}
+
+function normalizeAnchorSlug(anchorSlug: string | null | undefined): string | null {
+  return anchorSlug?.trim() || null;
+}
+
+function normalizeArticleId(articleId: LibraryItemId): LibraryItemId | null {
+  const normalizedArticleId = articleId.trim();
+  return normalizedArticleId ? normalizedArticleId : null;
+}
+
+function normalizeScrollOffsetY(scrollOffsetY: number | null | undefined): number | null {
+  return typeof scrollOffsetY === "number" && Number.isFinite(scrollOffsetY)
+    ? Math.max(0, scrollOffsetY)
+    : null;
 }
 
 async function readRawMarkdown(localPath: string): Promise<string> {

@@ -4,11 +4,6 @@ import type { LibraryItem, LibraryItemId } from "@/shared/library/types";
 
 import { sortLibraryItems } from "@/features/library/logic/libraryItemViewModel";
 import { getLibraryIndex, saveLibraryIndex } from "@/shared/library/libraryIndexStorage";
-import {
-  readLibraryItemById,
-  readLibraryItemReadingPosition,
-  saveLibraryItemReadingPosition,
-} from "@/shared/library/libraryStore";
 
 export function deleteLibraryItem(article: LibraryItem): LibraryItem[] {
   const index = getLibraryIndex();
@@ -89,5 +84,3 @@ function resolveManagedArticleDirectory(
 
   return localPath.startsWith(normalizedDirectoryUri) ? articleDirectory : null;
 }
-
-export { readLibraryItemById, readLibraryItemReadingPosition, saveLibraryItemReadingPosition };

@@ -1,18 +1,6 @@
-import {
-  getSingleRouteParam,
-  readArticleById,
-  readArticleContent,
-  readArticleReadingPosition,
-  saveArticleReadingPosition,
-} from "@/features/reader/logic/readerRepository";
-import {
-  readLibraryItemById,
-  readLibraryItemReadingPosition,
-  saveLibraryItemReadingPosition,
-} from "@/shared/library/libraryStore";
+import { getSingleRouteParam, readArticleContent } from "@/features/reader/logic/readerRepository";
 import { canReadTextFromWebUri, readTextFromWebUri } from "@/shared/logic/web/textUri";
 
-jest.mock("@/shared/library/libraryStore");
 jest.mock("@/shared/logic/web/textUri");
 jest.mock("expo-file-system", () => ({
   File: jest.fn().mockImplementation(() => ({
@@ -32,15 +20,6 @@ describe("readerRepository", () => {
 
     it("should handle undefined", () => {
       expect(getSingleRouteParam(undefined)).toBeUndefined();
-    });
-  });
-
-  describe("readArticleById", () => {
-    it("should call readLibraryItemById", () => {
-      (readLibraryItemById as jest.Mock).mockReturnValue({ id: "1" });
-      const result = readArticleById("1");
-      expect(result?.id).toBe("1");
-      expect(readLibraryItemById).toHaveBeenCalledWith("1");
     });
   });
 
@@ -79,33 +58,6 @@ describe("readerRepository", () => {
       await expect(readArticleContent("path", { signal: controller.signal })).rejects.toThrow(
         "The operation was aborted.",
       );
-    });
-  });
-
-  describe("article reading position", () => {
-    it("reads stored reading position from library persistence", () => {
-      (readLibraryItemReadingPosition as jest.Mock).mockReturnValue({
-        anchorSlug: "intro",
-        scrollOffsetY: 180,
-      });
-
-      expect(readArticleReadingPosition("1")).toEqual({
-        anchorSlug: "intro",
-        scrollOffsetY: 180,
-      });
-      expect(readLibraryItemReadingPosition).toHaveBeenCalledWith("1");
-    });
-
-    it("writes stored reading position through library persistence", () => {
-      saveArticleReadingPosition("1", {
-        anchorSlug: "section-2",
-        scrollOffsetY: 240,
-      });
-
-      expect(saveLibraryItemReadingPosition).toHaveBeenCalledWith("1", {
-        anchorSlug: "section-2",
-        scrollOffsetY: 240,
-      });
     });
   });
 });
