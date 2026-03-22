@@ -1,29 +1,22 @@
 import "@testing-library/jest-native/extend-expect";
 import fs from "fs";
 import path from "path";
-// 1) React Native Gesture Handler (required for many navigation/gesture libs)
 import "react-native-gesture-handler/jestSetup";
 
-// 2) Silence the “useNativeDriver” warning + a bunch of noisy RN Animated internals
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper", () => ({}), { virtual: true });
 
-// 3) Reanimated (needed for @gorhom/bottom-sheet, react-native-reanimated, etc.)
 jest.mock("react-native-reanimated", () => {
-  // Use the official mock
   const Reanimated = require("react-native-reanimated/mock");
 
-  // Some libs expect these helpers to exist
   Reanimated.default.call = () => {};
   return Reanimated;
 });
 
-// If you use Reanimated v2/v3+ you typically also want this:
 jest.mock("react-native-reanimated/src/Animated", () => {
   const Actual = jest.requireActual("react-native-reanimated/mock");
   return Actual;
 });
 
-// 4) Safe Area Context
 jest.mock("react-native-safe-area-context", () => {
   return {
     SafeAreaProvider: (props: any) => props.children,
@@ -38,7 +31,6 @@ jest.mock("react-native-safe-area-context", () => {
   };
 });
 
-// 5) Expo Haptics
 jest.mock("expo-haptics", () => ({
   AndroidHaptics: {
     Context_Click: "Context_Click",
@@ -56,7 +48,6 @@ jest.mock("expo-haptics", () => ({
   selectionAsync: jest.fn(),
 }));
 
-// 6) Mocking expo-router
 jest.mock("expo-router", () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -70,12 +61,9 @@ jest.mock("expo-router", () => ({
   Tabs: (props: any) => props.children,
 }));
 
-// 7) Wire up our mocks located in public folder
-// This mocks global.fetch so that calls to /mocks/file.md return the content of the file in public/mocks/
 global.fetch = jest.fn((url: string) => {
   if (url.startsWith("/mocks/")) {
     try {
-      // Trim leading slash and join with project root (where public/ exists)
       const relativePath = url.startsWith("/") ? url.slice(1) : url;
 
       const absolutePath = path.join(__dirname, "public", relativePath);
@@ -92,7 +80,7 @@ global.fetch = jest.fn((url: string) => {
   }
   return Promise.reject(new Error(`Fetch not mocked for URL: ${url}`));
 }) as jest.Mock;
-// 8) Mock expo-file-system
+
 jest.mock("expo-file-system", () => ({
   Directory: jest.fn().mockImplementation(() => ({
     create: jest.fn(),
@@ -110,7 +98,6 @@ jest.mock("expo-file-system", () => ({
   },
 }));
 
-// 9) Mock platformStorage to avoid top-level side effects
 jest.mock("@/shared/logic/platformStorage", () => ({
   createPlatformStorage: jest.fn(() => ({
     read: jest.fn(),
