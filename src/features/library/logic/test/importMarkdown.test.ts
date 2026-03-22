@@ -17,18 +17,23 @@ const mockFileCopyCalls: Array<{ from: string; to: string }> = [];
 const mockLegacyCopyCalls: Array<{ from: string; to: string }> = [];
 
 const mockSafDirectoryEntriesByUri = new Map<string, string[]>();
-let mockSafDirectoryPermissionResult: { granted: boolean; directoryUri?: string } = {
-  granted: false,
+const mockSafDirectoryPermissionState: { value: { granted: boolean; directoryUri?: string } } = {
+  value: { granted: false },
 };
+
+function getNextFsUriPart(part: unknown): string {
+  if (typeof part === "string") {
+    return part;
+  }
+  if (part && typeof part === "object" && "uri" in part) {
+    return String((part as { uri: string }).uri);
+  }
+  return "";
+}
 
 function mockJoinFsUri(parts: unknown[]): string {
   return parts.reduce<string>((currentUri, part) => {
-    const nextPart =
-      typeof part === "string"
-        ? part
-        : part && typeof part === "object" && "uri" in part
-          ? String((part as { uri: string }).uri)
-          : "";
+    const nextPart = getNextFsUriPart(part);
     if (!currentUri) {
       return nextPart;
     }
@@ -84,7 +89,7 @@ jest.mock("expo-file-system/legacy", () => ({
     mockFileTextByUri.set(to, sourceText);
   }),
   StorageAccessFramework: {
-    requestDirectoryPermissionsAsync: jest.fn(async () => mockSafDirectoryPermissionResult),
+    requestDirectoryPermissionsAsync: jest.fn(async () => mockSafDirectoryPermissionState.value),
     readDirectoryAsync: jest.fn(async (directoryUri: string) => {
       const directoryEntries = mockSafDirectoryEntriesByUri.get(directoryUri);
       if (!directoryEntries) {
@@ -95,6 +100,7 @@ jest.mock("expo-file-system/legacy", () => ({
   },
 }));
 
+/* oxlint-disable-next-line */
 describe("importMarkdown", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -102,7 +108,7 @@ describe("importMarkdown", () => {
     mockFileCopyCalls.length = 0;
     mockLegacyCopyCalls.length = 0;
     mockSafDirectoryEntriesByUri.clear();
-    mockSafDirectoryPermissionResult = { granted: false };
+    mockSafDirectoryPermissionState.value = { granted: false };
     Platform.OS = "web";
   });
 
@@ -145,6 +151,7 @@ describe("importMarkdown", () => {
     });
   });
 
+  /* oxlint-disable-next-line */
   describe("finalizeMarkdownImport", () => {
     it("should process markdown and return library item", async () => {
       Platform.OS = "web";
@@ -308,7 +315,7 @@ describe("importMarkdown", () => {
 
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fserenissima.png";
-      mockSafDirectoryPermissionResult = {
+      mockSafDirectoryPermissionState.value = {
         granted: true,
         directoryUri: grantedDirectoryUri,
       };
@@ -365,7 +372,7 @@ describe("importMarkdown", () => {
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fimages%2Fchart.png";
 
-      mockSafDirectoryPermissionResult = {
+      mockSafDirectoryPermissionState.value = {
         granted: true,
         directoryUri: grantedDirectoryUri,
       };
@@ -416,7 +423,7 @@ describe("importMarkdown", () => {
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fposts%2Fshared.png";
 
-      mockSafDirectoryPermissionResult = {
+      mockSafDirectoryPermissionState.value = {
         granted: true,
         directoryUri: grantedDirectoryUri,
       };
@@ -460,7 +467,7 @@ describe("importMarkdown", () => {
       const safResolvedAssetUri =
         "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fserenissima.png";
 
-      mockSafDirectoryPermissionResult = {
+      mockSafDirectoryPermissionState.value = {
         granted: true,
         directoryUri: grantedDirectoryUri,
       };

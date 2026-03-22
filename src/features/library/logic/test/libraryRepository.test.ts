@@ -13,16 +13,21 @@ import {
 } from "@/features/library/logic/libraryRepository";
 import { getLibraryIndex, saveLibraryIndex } from "@/shared/library/libraryIndexStorage";
 
+function getNextFsUriPart(part: unknown): string {
+  if (typeof part === "string") {
+    return part;
+  }
+  if (part && typeof part === "object" && "uri" in part) {
+    return String((part as { uri: string }).uri);
+  }
+  return "";
+}
+
 const mockDirectoryInstances: Array<{ uri: string; delete: jest.Mock }> = [];
 
 function mockJoinFsUri(parts: unknown[]): string {
   return parts.reduce<string>((currentUri, part) => {
-    const nextPart =
-      typeof part === "string"
-        ? part
-        : part && typeof part === "object" && "uri" in part
-          ? String((part as { uri: string }).uri)
-          : "";
+    const nextPart = getNextFsUriPart(part);
     if (!currentUri) {
       return nextPart;
     }

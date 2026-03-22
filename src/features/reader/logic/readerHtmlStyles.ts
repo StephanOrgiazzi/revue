@@ -57,15 +57,19 @@ function createBaseHeadingStyle(
   level: 1 | 2 | 3 | 4 | 5 | 6,
   weight: "900" | "800" | "700",
 ) {
+  const letterSpacing = getHeadingLetterSpacing(level);
+  const marginTop = getHeadingMarginTop(level);
+  const marginBottom = getHeadingMarginBottom(level);
+
   return {
     color: level <= 1 ? theme.colors.headingPrimary : theme.colors.headingSecondary,
     fontFamily: "sans-serif",
     fontSize: typography.scaleFontSize(theme.typography.headingSizes[level]),
     lineHeight: typography.scaleLineHeight(theme.typography.headingLineHeights[level]),
     fontWeight: weight,
-    letterSpacing: level === 1 ? -0.6 : level === 2 ? -0.2 : 0,
-    marginTop: level <= 2 ? 32 : level <= 3 ? 24 : level <= 4 ? 20 : 18,
-    marginBottom: level <= 2 ? (level === 1 ? 24 : 6) : level <= 3 ? 12 : 8,
+    letterSpacing,
+    marginTop,
+    marginBottom,
   };
 }
 
@@ -379,6 +383,39 @@ function createTypographyScale(markdownTextSizeLevel: MarkdownTextSizeLevel): Ty
     scaleLineHeight: (lineHeight: number) =>
       scaleTypographyValue(lineHeight, typographyScale, MIN_LINE_HEIGHT),
   };
+}
+
+function getHeadingLetterSpacing(level: 1 | 2 | 3 | 4 | 5 | 6): number {
+  if (level === 1) {
+    return -0.6;
+  }
+  if (level === 2) {
+    return -0.2;
+  }
+  return 0;
+}
+
+function getHeadingMarginBottom(level: 1 | 2 | 3 | 4 | 5 | 6): number {
+  if (level <= 2) {
+    return level === 1 ? 24 : 6;
+  }
+  if (level <= 3) {
+    return 12;
+  }
+  return 8;
+}
+
+function getHeadingMarginTop(level: 1 | 2 | 3 | 4 | 5 | 6): number {
+  if (level <= 2) {
+    return 32;
+  }
+  if (level <= 3) {
+    return 24;
+  }
+  if (level <= 4) {
+    return 20;
+  }
+  return 18;
 }
 
 function getSyntaxColors(theme: Theme): SyntaxColors {

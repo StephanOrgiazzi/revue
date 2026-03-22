@@ -57,21 +57,18 @@ export function getControlsSheetLayoutConfig({
     Math.round(readerSheetHeight - READER_TOC_RESERVED_HEIGHT - sheetBottomPadding),
   );
 
-  const tocListFallbackMaxHeight = canSwipeBetweenReaderPanels
-    ? 440
-    : canShowThemeSelection
-      ? 320
-      : 440;
+  const tocListFallbackMaxHeight = getTocListFallbackMaxHeight({
+    canSwipeBetweenReaderPanels,
+    canShowThemeSelection,
+  });
 
   const tocListMaxHeight = isReaderSheet ? readerTocListMaxHeight : tocListFallbackMaxHeight;
 
-  const sheetTitle = canSwipeBetweenReaderPanels
-    ? activeReaderPanel === "toc"
-      ? "Navigation"
-      : "Settings"
-    : showTableOfContents
-      ? "Navigation"
-      : "Settings";
+  const sheetTitle = getSheetTitle({
+    canSwipeBetweenReaderPanels,
+    activeReaderPanel,
+    showTableOfContents,
+  });
 
   return {
     isReaderSheet,
@@ -81,4 +78,25 @@ export function getControlsSheetLayoutConfig({
     tocListMaxHeight,
     sheetTitle,
   };
+}
+
+function getSheetTitle(params: {
+  canSwipeBetweenReaderPanels: boolean;
+  activeReaderPanel: "toc" | "settings";
+  showTableOfContents: boolean;
+}): string {
+  if (params.canSwipeBetweenReaderPanels) {
+    return params.activeReaderPanel === "toc" ? "Navigation" : "Settings";
+  }
+  return params.showTableOfContents ? "Navigation" : "Settings";
+}
+
+function getTocListFallbackMaxHeight(params: {
+  canSwipeBetweenReaderPanels: boolean;
+  canShowThemeSelection: boolean;
+}): number {
+  if (!params.canSwipeBetweenReaderPanels && params.canShowThemeSelection) {
+    return 320;
+  }
+  return 440;
 }

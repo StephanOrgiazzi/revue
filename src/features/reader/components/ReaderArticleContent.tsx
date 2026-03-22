@@ -1,7 +1,6 @@
 import type { ReactNode, RefObject } from "react";
-import type { ScrollViewProps } from "react-native";
 
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, type ScrollViewProps } from "react-native";
 import { RenderHTMLSource } from "react-native-render-html";
 
 import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
@@ -56,6 +55,18 @@ export function ReaderArticleContent({
   onBlockLayout,
 }: ReaderArticleContentProps) {
   const htmlBlockOccurrences = new Map<string, number>();
+  const content = createReaderContent({
+    isLoading,
+    theme,
+    htmlContentWidth,
+    horizontalPadding,
+    shouldShowArticleHeader,
+    isContentEmpty,
+    listEmptyComponent,
+    htmlBlocks,
+    onBlockLayout,
+    htmlBlockOccurrences,
+  });
 
   return (
     <ScrollView
@@ -69,34 +80,53 @@ export function ReaderArticleContent({
       scrollEventThrottle={100}
     >
       {shouldSuppressListHeader ? null : listHeaderComponent}
-      {isLoading ? (
-        <ReaderSkeleton
-          theme={theme}
-          contentWidth={htmlContentWidth}
-          horizontalPadding={horizontalPadding}
-          verticalPadding={0}
-          showHeader={shouldShowArticleHeader}
-        />
-      ) : isContentEmpty ? (
-        listEmptyComponent
-      ) : (
-        htmlBlocks.map((htmlBlock, blockIndex) => {
-          const occurrenceCount = (htmlBlockOccurrences.get(htmlBlock) ?? 0) + 1;
-          htmlBlockOccurrences.set(htmlBlock, occurrenceCount);
-
-          return (
-            <HtmlBlockItem
-              key={`${htmlBlock.length}:${occurrenceCount}:${htmlBlock}`}
-              htmlBlock={htmlBlock}
-              htmlContentWidth={htmlContentWidth}
-              blockIndex={blockIndex}
-              onBlockLayout={onBlockLayout}
-            />
-          );
-        })
-      )}
+      {content}
     </ScrollView>
   );
+}
+
+function createReaderContent(params: {
+  isLoading: boolean;
+  theme: ReturnType<typeof useThemePreferences>["theme"];
+  htmlContentWidth: number;
+  horizontalPadding: number;
+  shouldShowArticleHeader: boolean;
+  isContentEmpty: boolean;
+  listEmptyComponent: ReactNode;
+  htmlBlocks: string[];
+  onBlockLayout: (blockIndex: number, blockY: number) => void;
+  htmlBlockOccurrences: Map<string, number>;
+}): ReactNode {
+  if (params.isLoading) {
+    return (
+      <ReaderSkeleton
+        theme={params.theme}
+        contentWidth={params.htmlContentWidth}
+        horizontalPadding={params.horizontalPadding}
+        verticalPadding={0}
+        showHeader={params.shouldShowArticleHeader}
+      />
+    );
+  }
+
+  if (params.isContentEmpty) {
+    return params.listEmptyComponent;
+  }
+
+  return params.htmlBlocks.map((htmlBlock, blockIndex) => {
+    const occurrenceCount = (params.htmlBlockOccurrences.get(htmlBlock) ?? 0) + 1;
+    params.htmlBlockOccurrences.set(htmlBlock, occurrenceCount);
+
+    return (
+      <HtmlBlockItem
+        key={`${htmlBlock.length}:${occurrenceCount}:${htmlBlock}`}
+        htmlBlock={htmlBlock}
+        htmlContentWidth={params.htmlContentWidth}
+        blockIndex={blockIndex}
+        onBlockLayout={params.onBlockLayout}
+      />
+    );
+  });
 }
 
 function HtmlBlockItem({

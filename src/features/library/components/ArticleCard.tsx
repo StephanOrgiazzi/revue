@@ -20,6 +20,7 @@ export const ArticleCard = memo(
     const cardPalette = palette ?? cardPaletteForTitle(article.title);
 
     const formattedImportDate = formatArticleDate(article.createdAt);
+    const footerLabel = disabled ? "Importing" : formattedImportDate;
 
     return (
       <Pressable
@@ -44,12 +45,12 @@ export const ArticleCard = memo(
             {article.title}
           </Text>
 
-          {disabled ? (
-            <Text className="text-sm font-semibold uppercase tracking-[1.1px] text-slate-700">
-              Importing
+          {footerLabel ? (
+            <Text
+              className={`text-sm font-semibold text-slate-700 ${disabled ? "uppercase tracking-[1.1px]" : ""}`}
+            >
+              {footerLabel}
             </Text>
-          ) : formattedImportDate ? (
-            <Text className="text-sm font-semibold text-slate-700">{formattedImportDate}</Text>
           ) : null}
         </View>
       </Pressable>

@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ComponentProps } from "react";
 import {
   Text,
   View,
@@ -26,6 +26,35 @@ import { useReaderScreenViewModel } from "@/features/reader/hooks/useReaderScree
 import { THEME_OPTIONS } from "@/shared/themes/themes";
 import { useThemePreferences } from "@/shared/themes/useThemePreferences";
 import { ScreenContainer } from "@/shared/ui/ScreenContainer";
+
+type ReaderArticleContentProps = ComponentProps<typeof ReaderArticleContent>;
+type ReaderBodyProps = {
+  hasError: boolean;
+  errorColor: string;
+  errorMessage: string | null;
+  htmlSystemFonts: ReaderScreenViewModel["htmlSystemFonts"];
+  htmlStyles: ReaderScreenViewModel["htmlStyles"];
+  htmlRenderersProps: ReaderScreenViewModel["htmlRenderersProps"];
+} & Pick<
+  ReaderArticleContentProps,
+  | "articleScrollRef"
+  | "contentContainerStyle"
+  | "onContentSizeChange"
+  | "onScroll"
+  | "shouldSuppressListHeader"
+  | "listHeaderComponent"
+  | "isLoading"
+  | "theme"
+  | "htmlContentWidth"
+  | "horizontalPadding"
+  | "shouldShowArticleHeader"
+  | "isContentEmpty"
+  | "listEmptyComponent"
+  | "htmlBlocks"
+  | "onBlockLayout"
+>;
+type ReaderRouter = Pick<ReturnType<typeof useRouter>, "back" | "canGoBack" | "replace">;
+type ReaderScreenViewModel = ReturnType<typeof useReaderScreenViewModel>;
 
 export function ReaderScreen() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
@@ -94,6 +123,13 @@ export function ReaderScreen() {
   const hasRenderedArticleContent =
     !isLoading && renderedArticleContentKey === articleContentRenderKey;
 
+  const isFloatingMenuEnabled = isFloatingMenuInteractionEnabled({
+    hasError,
+    isLoading,
+    isReadingPositionRestoreReady,
+    hasRenderedArticleContent,
+  });
+
   const handleContentSizeChangeWithFloatingMenu = useCallback(() => {
     handleContentSizeChange();
     if (!isLoading) {
@@ -104,10 +140,7 @@ export function ReaderScreen() {
   const {
     isFloatingMenuButtonVisible,
     handleScrollOffsetChange: handleFloatingMenuScrollOffsetChange,
-  } = useReaderFloatingMenuVisibility({
-    isEnabled:
-      !hasError && !isLoading && isReadingPositionRestoreReady && hasRenderedArticleContent,
-  });
+  } = useReaderFloatingMenuVisibility({ isEnabled: isFloatingMenuEnabled });
 
   const handleArticleScrollWithFloatingMenu = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -117,12 +150,10 @@ export function ReaderScreen() {
     [handleArticleScroll, handleFloatingMenuScrollOffsetChange],
   );
 
-  const shouldDisplayFloatingMenu =
-    !hasError &&
-    !isLoading &&
-    isReadingPositionRestoreReady &&
-    hasRenderedArticleContent &&
-    isFloatingMenuButtonVisible;
+  const shouldDisplayFloatingMenu = shouldDisplayFloatingMenuButton({
+    isFloatingMenuEnabled,
+    isFloatingMenuButtonVisible,
+  });
 
   const listHeaderComponent = useMemo(
     () =>
@@ -143,13 +174,7 @@ export function ReaderScreen() {
   );
 
   const handleExitReader = useCallback(() => {
-    persistReadingPosition();
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-
-    router.replace("/");
+    exitReader(router, persistReadingPosition);
   }, [persistReadingPosition, router]);
 
   return (
@@ -170,42 +195,29 @@ export function ReaderScreen() {
       />
       <StatusBar style={theme.isDark ? "light" : "dark"} />
 
-      {hasError ? (
-        <ReaderErrorState errorColor={theme.colors.error} errorMessage={errorMessage} />
-      ) : (
-        <View style={{ flex: 1 }}>
-          <TRenderEngineProvider
-            systemFonts={htmlSystemFonts}
-            baseStyle={htmlStyles.baseStyle}
-            tagsStyles={htmlStyles.tagsStyles}
-            classesStyles={htmlStyles.classesStyles}
-          >
-            <RenderHTMLConfigProvider
-              renderers={readerHtmlRenderers}
-              renderersProps={htmlRenderersProps}
-              enableExperimentalMarginCollapsing
-            >
-              <ReaderArticleContent
-                articleScrollRef={articleScrollRef}
-                contentContainerStyle={contentContainerStyle}
-                onContentSizeChange={handleContentSizeChangeWithFloatingMenu}
-                onScroll={handleArticleScrollWithFloatingMenu}
-                shouldSuppressListHeader={shouldSuppressListHeader}
-                listHeaderComponent={listHeaderComponent}
-                isLoading={isLoading}
-                theme={theme}
-                htmlContentWidth={htmlContentWidth}
-                horizontalPadding={horizontalPadding}
-                shouldShowArticleHeader={shouldShowArticleHeader}
-                isContentEmpty={isContentEmpty}
-                listEmptyComponent={listEmptyComponent}
-                htmlBlocks={htmlBlocks}
-                onBlockLayout={handleBlockLayout}
-              />
-            </RenderHTMLConfigProvider>
-          </TRenderEngineProvider>
-        </View>
-      )}
+      <ReaderBody
+        hasError={hasError}
+        errorColor={theme.colors.error}
+        errorMessage={errorMessage}
+        htmlSystemFonts={htmlSystemFonts}
+        htmlStyles={htmlStyles}
+        htmlRenderersProps={htmlRenderersProps}
+        articleScrollRef={articleScrollRef}
+        contentContainerStyle={contentContainerStyle}
+        onContentSizeChange={handleContentSizeChangeWithFloatingMenu}
+        onScroll={handleArticleScrollWithFloatingMenu}
+        shouldSuppressListHeader={shouldSuppressListHeader}
+        listHeaderComponent={listHeaderComponent}
+        isLoading={isLoading}
+        theme={theme}
+        htmlContentWidth={htmlContentWidth}
+        horizontalPadding={horizontalPadding}
+        shouldShowArticleHeader={shouldShowArticleHeader}
+        isContentEmpty={isContentEmpty}
+        listEmptyComponent={listEmptyComponent}
+        htmlBlocks={htmlBlocks}
+        onBlockLayout={handleBlockLayout}
+      />
       <ReaderRestoringOverlay
         visible={!hasError && isRestoringReadingPosition}
         backgroundColor={pageBackgroundColor}
@@ -229,6 +241,67 @@ export function ReaderScreen() {
         onExitReader={handleExitReader}
       />
     </ScreenContainer>
+  );
+}
+
+function exitReader(router: ReaderRouter, persistReadingPosition: () => void) {
+  persistReadingPosition();
+  if (router.canGoBack()) {
+    router.back();
+    return;
+  }
+
+  router.replace("/");
+}
+
+function isFloatingMenuInteractionEnabled(props: {
+  hasError: boolean;
+  isLoading: boolean;
+  isReadingPositionRestoreReady: boolean;
+  hasRenderedArticleContent: boolean;
+}) {
+  const { hasError, isLoading, isReadingPositionRestoreReady, hasRenderedArticleContent } = props;
+  return !hasError && !isLoading && isReadingPositionRestoreReady && hasRenderedArticleContent;
+}
+
+function ReaderBody(props: ReaderBodyProps) {
+  if (props.hasError) {
+    return <ReaderErrorState errorColor={props.errorColor} errorMessage={props.errorMessage} />;
+  }
+
+  return (
+    <View style={{ flex: 1 }}>
+      <TRenderEngineProvider
+        systemFonts={props.htmlSystemFonts}
+        baseStyle={props.htmlStyles.baseStyle}
+        tagsStyles={props.htmlStyles.tagsStyles}
+        classesStyles={props.htmlStyles.classesStyles}
+      >
+        <RenderHTMLConfigProvider
+          renderers={readerHtmlRenderers}
+          renderersProps={props.htmlRenderersProps}
+          enableExperimentalMarginCollapsing
+        >
+          <ReaderArticleContent
+            articleScrollRef={props.articleScrollRef}
+            contentContainerStyle={props.contentContainerStyle}
+            onContentSizeChange={props.onContentSizeChange}
+            onScroll={props.onScroll}
+            shouldSuppressListHeader={props.shouldSuppressListHeader}
+            listHeaderComponent={props.listHeaderComponent}
+            isLoading={props.isLoading}
+            theme={props.theme}
+            htmlContentWidth={props.htmlContentWidth}
+            horizontalPadding={props.horizontalPadding}
+            shouldShowArticleHeader={props.shouldShowArticleHeader}
+            isContentEmpty={props.isContentEmpty}
+            listEmptyComponent={props.listEmptyComponent}
+            htmlBlocks={props.htmlBlocks}
+            onBlockLayout={props.onBlockLayout}
+          />
+        </RenderHTMLConfigProvider>
+      </TRenderEngineProvider>
+    </View>
   );
 }
 
@@ -274,4 +347,11 @@ function ReaderRestoringOverlay(props: {
       />
     </View>
   );
+}
+
+function shouldDisplayFloatingMenuButton(props: {
+  isFloatingMenuEnabled: boolean;
+  isFloatingMenuButtonVisible: boolean;
+}) {
+  return props.isFloatingMenuEnabled && props.isFloatingMenuButtonVisible;
 }

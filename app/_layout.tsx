@@ -1,4 +1,4 @@
-import "../global.css";
+import "./global.css";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";

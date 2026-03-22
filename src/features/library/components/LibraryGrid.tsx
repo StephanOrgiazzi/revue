@@ -91,19 +91,16 @@ export const LibraryGrid = memo(
             className="mb-2.5 flex-1"
             style={cardWidth === undefined ? undefined : { width: cardWidth }}
           >
-            {item.kind === "spacer" ? (
-              <View className="h-[180px]" />
-            ) : item.kind === "import" ? (
-              <ImportCard theme={theme} isImporting={isImporting} onPress={onImport} />
-            ) : (
-              <ArticleCard
-                article={item.article}
-                palette={articleCardPalettes[item.article.id]}
-                disabled={pendingArticleIdsSet.has(item.article.id)}
-                onPress={onOpenArticle}
-                onLongPress={onArticleLongPress}
-              />
-            )}
+            {renderGridCardContent({
+              item,
+              theme,
+              isImporting,
+              onImport,
+              articleCardPalettes,
+              pendingArticleIdsSet,
+              onOpenArticle,
+              onArticleLongPress,
+            })}
           </View>
         );
       },
@@ -142,3 +139,34 @@ export const LibraryGrid = memo(
 );
 
 LibraryGrid.displayName = "LibraryGrid";
+
+function renderGridCardContent(params: {
+  item: LibraryGridCard;
+  theme: Theme;
+  isImporting: boolean;
+  onImport: () => void;
+  articleCardPalettes: ReturnType<typeof buildCardPalettesForGrid>;
+  pendingArticleIdsSet: Set<LibraryItemId>;
+  onOpenArticle: (articleId: LibraryItemId) => void;
+  onArticleLongPress: (article: LibraryItem) => void;
+}) {
+  if (params.item.kind === "spacer") {
+    return <View className="h-[180px]" />;
+  }
+
+  if (params.item.kind === "import") {
+    return (
+      <ImportCard theme={params.theme} isImporting={params.isImporting} onPress={params.onImport} />
+    );
+  }
+
+  return (
+    <ArticleCard
+      article={params.item.article}
+      palette={params.articleCardPalettes[params.item.article.id]}
+      disabled={params.pendingArticleIdsSet.has(params.item.article.id)}
+      onPress={params.onOpenArticle}
+      onLongPress={params.onArticleLongPress}
+    />
+  );
+}
