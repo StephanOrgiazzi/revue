@@ -6,15 +6,45 @@ import "react-native-gesture-handler/jestSetup";
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper", () => ({}), { virtual: true });
 
 jest.mock("react-native-reanimated", () => {
-  const Reanimated = require("react-native-reanimated/mock");
+  const { View } = require("react-native");
 
-  Reanimated.default.call = () => {};
-  return Reanimated;
+  return {
+    __esModule: true,
+    default: {
+      View,
+      call: () => {},
+      createAnimatedComponent: (component: unknown) => component,
+    },
+    Easing: {
+      cubic: jest.fn(),
+      inOut: jest.fn((value) => value),
+      out: jest.fn((value) => value),
+      quad: jest.fn(),
+    },
+    ReduceMotion: { System: "system" },
+    cancelAnimation: jest.fn(),
+    createAnimatedComponent: (component: unknown) => component,
+    interpolate: jest.fn((value) => value),
+    runOnJS: (fn: (...args: any[]) => any) => fn,
+    useAnimatedStyle: (updater: () => unknown) => updater(),
+    useEvent: () => jest.fn(),
+    useReducedMotion: () => false,
+    useSharedValue: (value: unknown) => ({ value }),
+    withRepeat: jest.fn((value) => value),
+    withTiming: jest.fn((value) => value),
+    View,
+  };
 });
 
 jest.mock("react-native-reanimated/src/Animated", () => {
-  const Actual = jest.requireActual("react-native-reanimated/mock");
-  return Actual;
+  const { View } = require("react-native");
+
+  return {
+    default: {
+      View,
+    },
+    View,
+  };
 });
 
 jest.mock("react-native-safe-area-context", () => {

@@ -68,7 +68,17 @@ jest.mock("react-native-gesture-handler", () => ({
 }));
 
 jest.mock("react-native-reanimated", () => ({
-  ...require("react-native-reanimated/mock"),
+  __esModule: true,
+  default: {
+    View: require("react-native").View,
+    createAnimatedComponent: (component: unknown) => component,
+  },
+  View: require("react-native").View,
+  createAnimatedComponent: (component: unknown) => component,
+  Easing: {
+    cubic: jest.fn(),
+    out: jest.fn((value) => value),
+  },
   useSharedValue: (value: number) => ({ value }),
   useAnimatedStyle: () => ({}),
   withTiming: (value: number) => value,

@@ -207,6 +207,10 @@ export const TableOfContentsSection = memo(
       handleTocMomentumEnd,
     } = useTableOfContentsScrollHaptics(visible, filteredHeadings.length);
 
+    const bottomSheetScrollHandlers = {
+      onScroll: handleTocScroll,
+    };
+
     useEffect(() => {
       if (!visible) {
         return;
@@ -269,11 +273,10 @@ export const TableOfContentsSection = memo(
             });
           }}
           focusHook={useFocusEffect}
-          onScroll={handleTocScroll}
+          {...bottomSheetScrollHandlers}
           onScrollBeginDrag={handleTocScrollBeginDrag}
           onScrollEndDrag={handleTocScrollEndDrag}
           onMomentumScrollEnd={handleTocMomentumEnd}
-          scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           initialNumToRender={8}
           maxToRenderPerBatch={8}

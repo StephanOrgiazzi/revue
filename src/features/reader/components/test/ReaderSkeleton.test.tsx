@@ -3,11 +3,28 @@ import React from "react";
 import Animated from "react-native-reanimated";
 
 jest.mock("react-native-reanimated", () => {
-  const Reanimated = require("react-native-reanimated/mock");
-  Reanimated.cancelAnimation = jest.fn();
-  Reanimated.useReducedMotion = () => false;
-  Reanimated.ReduceMotion = { System: "system" };
-  return Reanimated;
+  const { View } = require("react-native");
+
+  return {
+    __esModule: true,
+    default: {
+      View,
+      createAnimatedComponent: (component: unknown) => component,
+    },
+    Easing: {
+      inOut: jest.fn((value) => value),
+      quad: jest.fn(),
+    },
+    ReduceMotion: { System: "system" },
+    cancelAnimation: jest.fn(),
+    interpolate: jest.fn((value) => value),
+    useAnimatedStyle: (updater: () => unknown) => updater(),
+    useReducedMotion: () => false,
+    useSharedValue: (value: unknown) => ({ value }),
+    withRepeat: jest.fn((value) => value),
+    withTiming: jest.fn((value) => value),
+    View,
+  };
 });
 
 import { ReaderSkeleton } from "@/features/reader/components/ReaderSkeleton";
